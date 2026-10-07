@@ -8,7 +8,7 @@ API REST para procesamiento y analisis de respuestas al impulso segun la norma I
 
 ## Descripción
 
-En este trabajo práctrico de Señales y Sistemas de la carrera de Ingeniería en sonido en UNTREF se desarollará una API REST diseñada para el procesamiento y 
+En este trabajo práctrico de Señales y Sistemas de la carrera de Ingeniería de sonido en UNTREF se desarollará una API REST diseñada para el procesamiento y 
 análisis de respuestas al impulso en recintos (RIR). 
 Esta herramienta permite recibir archivos de audio con señales acústicas y procesarlas 
 para calcular parámetros definidos por la norma ISO 3382-1, tales como el tiempo de reverberación (T20, T30), el tiempo de 
@@ -20,14 +20,17 @@ desde la limpieza y filtrado de la señal de excitación, hasta la obtención de
 - Consigna, especificaciones y ruta del TP: <https://maxiyommi.github.io/signal-systems/trabajo_practico/ruta/>
 - API de referencia de la catedra (Swagger UI): <https://rir-api.onrender.com/docs>
 
+> Este README es un punto de partida: el grupo lo completa en M0 (integrantes, roles,
+> diagrama de arquitectura, branching strategy) y lo va actualizando hasta M3 (seccion
+> "Validacion" con los resultados).
 
 ## Integrantes
 
 | Nombre | Legajo | Rol |
 |--------|--------|-----|
 |Cadirola Valentino|80692|Dev|
-|Collado Horlent Vicente|80478|Reviewer / QA|
-|Pascuccelli Tadeo|72794|Integrador|
+|Collado Vicente|80478|Reviewer / QA|
+|Pascuccelli Tadeos|72794|Integrador|
 ## Requisitos previos
 
 - Python 3.12 o superior
@@ -132,6 +135,28 @@ Cada milestone expone lo que construye: los routers y schemas de `signals` se ag
 ### Diagrama de Arquitectura
 
 ![Diagrama de Arquitectura](docs/diagrama_arquitectura.png)
+
+### Branching Strategy
+
+La rama `main` está protegida, toda rama deberá ser integrada a través de un **Pull Request (PR)**
+
+Para cada issue se creará una rama cuyo nombre será `feature/nombre-descriptivo`.
+
+Los commits deberán seguir la nomenclatura `<tipo>: <descripción breve>`, los tipos pueden ser:
+- `feat` :	Nueva funcionalidad
+- `fix`:	Corrección de bug
+- `docs`:	Cambios en documentación
+- `test`:	Agregar o modificar tests
+- `refactor`:	Reestructurar sin cambiar funcionalidad
+- `style`:	Formato, espacios, puntos y comas
+
+Para cada entrega se seguirá el siguiente flujo:
+1. Asignación de issues correspondientes al Milestone actual
+2. Cada desarrollador crea su rama
+3. Desarrolla, hace commits y sube la rama al remote repo (GitHub)
+4. Abre un Pull Request hacia `main`
+5. Una vez que el PR pasa la revisión, se mergea
+6. Al completar un Milestone, se etiquetará el commit en `main` con la versión correspondiente (`v0.1.0` para M1, `v0.2.0` para M2, `v1.0.0` para M3)
 
 ## Milestones y entregas (2C 2026)
 
