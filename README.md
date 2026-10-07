@@ -6,9 +6,9 @@ API REST para procesamiento y analisis de respuestas al impulso segun la norma I
 ![CI](https://github.com/<Cadirola24>/<rir-rar>/actions/workflows/ci.yml/badge.svg)
 ![Python](https://img.shields.io/badge/python-3.12+-blue.svg)
 
-## Descripcion
+## Descripción
 
-En este trabajo práctrico de Señales y Sistemas de UNTREF se desarollará una API REST diseñada para el procesamiento y 
+En este trabajo práctrico de Señales y Sistemas de la carrera de Ingeniería en sonido en UNTREF se desarollará una API REST diseñada para el procesamiento y 
 análisis de respuestas al impulso en recintos (RIR). 
 Esta herramienta permite recibir archivos de audio con señales acústicas y procesarlas 
 para calcular parámetros definidos por la norma ISO 3382-1, tales como el tiempo de reverberación (T20, T30), el tiempo de 
@@ -20,17 +20,14 @@ desde la limpieza y filtrado de la señal de excitación, hasta la obtención de
 - Consigna, especificaciones y ruta del TP: <https://maxiyommi.github.io/signal-systems/trabajo_practico/ruta/>
 - API de referencia de la catedra (Swagger UI): <https://rir-api.onrender.com/docs>
 
-> Este README es un punto de partida: el grupo lo completa en M0 (integrantes, roles,
-> diagrama de arquitectura, branching strategy) y lo va actualizando hasta M3 (seccion
-> "Validacion" con los resultados).
 
 ## Integrantes
 
 | Nombre | Legajo | Rol |
 |--------|--------|-----|
 |Cadirola Valentino|80692|Dev|
-|Collado Vicente|80478|Reviewer / QA|
-|Pascuccelli Tadeos|72794|Integrador|
+|Collado Horlent Vicente|80478|Reviewer / QA|
+|Pascuccelli Tadeo|72794|Integrador|
 ## Requisitos previos
 
 - Python 3.12 o superior
@@ -131,6 +128,8 @@ rir-api/
 Cada milestone expone lo que construye: los routers y schemas de `signals` se agregan en M1
 (y suman `synthetic-ir` en M2), los de `filters` en M2 y los de `acoustics` y `utils` en M3
 (ver los `TODO` en `app/main.py`).
+
+### Diagrama de Arquitectura
 
 ![Diagrama de Arquitectura](docs/diagrama_arquitectura.png)
 
