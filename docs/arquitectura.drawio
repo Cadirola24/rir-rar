@@ -1,0 +1,221 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Página-1" id="xEdgHpv9NqreJMhps0rw">
+    <mxGraphModel dx="2570" dy="870" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-31" parent="1" style="swimlane;whiteSpace=wrap;html=1;" value="app/routers/" vertex="1">
+          <mxGeometry height="210" width="1070" x="-120" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-63" edge="1" parent="ZiEeveE4ZL_LOoTnfZXo-31" source="ZiEeveE4ZL_LOoTnfZXo-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="ZiEeveE4ZL_LOoTnfZXo-59">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-15" parent="ZiEeveE4ZL_LOoTnfZXo-31" style="whiteSpace=wrap;html=1;rotation=0;" value="health.py&lt;div&gt;GET /health&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="30" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-16" parent="ZiEeveE4ZL_LOoTnfZXo-31" style="whiteSpace=wrap;html=1;" value="signals.py&lt;div&gt;POST /signals/pink-noise&lt;/div&gt;&lt;div&gt;POST /signals/sine-sweep&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="195" x="242.5" y="92.5" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-17" parent="ZiEeveE4ZL_LOoTnfZXo-31" style="whiteSpace=wrap;html=1;" value="filters.py&lt;div&gt;POST /filters/single-band&lt;/div&gt;&lt;div&gt;signals.py&lt;/div&gt;&lt;div&gt;POST /signals/synthetic-ir&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="170" x="616" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-18" parent="ZiEeveE4ZL_LOoTnfZXo-31" style="whiteSpace=wrap;html=1;" value="utils.py&lt;div&gt;POST /utils/smoothing&lt;/div&gt;&lt;div&gt;POST /utils/schroeder&lt;/div&gt;&lt;div&gt;POST /utils/lundeby&lt;/div&gt;&lt;div&gt;acoustics.py&lt;/div&gt;&lt;div&gt;POST /acoustics/parameters&lt;/div&gt;" vertex="1">
+          <mxGeometry height="105" width="170" x="820" y="47.5" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-59" parent="ZiEeveE4ZL_LOoTnfZXo-31" style="whiteSpace=wrap;html=1;" value="audio_http-py&lt;div&gt;wav_response&lt;/div&gt;&lt;div&gt;uploaded_file&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="30" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-2" edge="1" parent="1" source="ZiEeveE4ZL_LOoTnfZXo-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="ZiEeveE4ZL_LOoTnfZXo-3">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="220" y="280" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="&lt;div&gt;Cliente&lt;/div&gt;&lt;div&gt;Swagger - fronted - script - sube un WAV&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="180" x="130" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-61" edge="1" parent="1" source="ZiEeveE4ZL_LOoTnfZXo-3" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;edgeStyle=orthogonalEdgeStyle;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="ZiEeveE4ZL_LOoTnfZXo-15">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="220" y="360" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-64" edge="1" parent="1" source="ZiEeveE4ZL_LOoTnfZXo-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fillColor=#e1d5e7;strokeColor=light-dark(#9673A6,#FFFFFF);" target="ZiEeveE4ZL_LOoTnfZXo-16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-65" edge="1" parent="1" source="ZiEeveE4ZL_LOoTnfZXo-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="ZiEeveE4ZL_LOoTnfZXo-17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-67" edge="1" parent="1" source="ZiEeveE4ZL_LOoTnfZXo-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="ZiEeveE4ZL_LOoTnfZXo-18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-3" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="request HTTP + JSON&amp;nbsp;" vertex="1">
+          <mxGeometry height="30" width="130" x="155" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-19" parent="1" style="swimlane;whiteSpace=wrap;html=1;" value="app/schemas/" vertex="1">
+          <mxGeometry height="200" width="590" x="650" y="680" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-22" parent="ZiEeveE4ZL_LOoTnfZXo-19" style="whiteSpace=wrap;html=1;" value="signals.py&lt;div&gt;SyntheticIRResquest&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="320" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-21" parent="ZiEeveE4ZL_LOoTnfZXo-19" style="whiteSpace=wrap;html=1;" value="signals.py&lt;div&gt;PinkNoiseRequest&lt;/div&gt;&lt;div&gt;SineSweepRequest&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="173" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-23" parent="ZiEeveE4ZL_LOoTnfZXo-19" style="whiteSpace=wrap;html=1;" value="utils.py&lt;div&gt;SmoothingRequest&lt;/div&gt;&lt;div&gt;SchoroederResponse&lt;/div&gt;&lt;div&gt;LundebyResponse&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="467" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-24" parent="ZiEeveE4ZL_LOoTnfZXo-19" style="whiteSpace=wrap;html=1;" value="responses.py&lt;div&gt;HealthResponse&lt;/div&gt;&lt;div&gt;BandAnalysisResponse&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="143" x="3" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-29" parent="1" style="swimlane;whiteSpace=wrap;html=1;" value="app/services/" vertex="1">
+          <mxGeometry height="300" width="810" x="-230" y="680" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-94" edge="1" parent="ZiEeveE4ZL_LOoTnfZXo-29" source="ZiEeveE4ZL_LOoTnfZXo-35" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=light-dark(#9673A6,#990099);" target="ZiEeveE4ZL_LOoTnfZXo-37">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-35" parent="ZiEeveE4ZL_LOoTnfZXo-29" style="whiteSpace=wrap;html=1;" value="Pink_noise.py&lt;div&gt;generate_pink_noise&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="100" y="57.5" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-36" parent="ZiEeveE4ZL_LOoTnfZXo-29" style="whiteSpace=wrap;html=1;" value="audio_io.py&lt;div&gt;play_and_record&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="100" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-95" edge="1" parent="ZiEeveE4ZL_LOoTnfZXo-29" source="ZiEeveE4ZL_LOoTnfZXo-37" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=light-dark(#9673A6,#990099);">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="160" y="222.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-37" parent="ZiEeveE4ZL_LOoTnfZXo-29" style="whiteSpace=wrap;html=1;" value="sine_sweep_py&lt;div&gt;generate_sine_sweep_pair&lt;/div&gt;" vertex="1">
+          <mxGeometry height="50" width="160" x="80" y="142.5" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-91" edge="1" parent="ZiEeveE4ZL_LOoTnfZXo-29" source="ZiEeveE4ZL_LOoTnfZXo-39" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=light-dark(#000000,#00CC00);" target="ZiEeveE4ZL_LOoTnfZXo-40">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-39" parent="ZiEeveE4ZL_LOoTnfZXo-29" style="whiteSpace=wrap;html=1;" value="singal_utils.py&lt;div&gt;&lt;div&gt;load_audio&lt;/div&gt;&lt;div&gt;generate_synthetic_ir&lt;/div&gt;&lt;div&gt;get_impulse_response&lt;/div&gt;&lt;div&gt;logarithmic_scale_conversion&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="220" x="300" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-41" parent="ZiEeveE4ZL_LOoTnfZXo-29" style="whiteSpace=wrap;html=1;" value="acoustic_parameters.py&lt;div&gt;&lt;div&gt;apply_smoothing&lt;/div&gt;&lt;div&gt;apply_schroeder_integral&lt;/div&gt;&lt;div&gt;linear_regression&lt;/div&gt;&lt;div&gt;calculate_parameters_from_ir&lt;/div&gt;&lt;div&gt;apply_lundeby&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="210" x="554" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-40" parent="ZiEeveE4ZL_LOoTnfZXo-29" style="whiteSpace=wrap;html=1;" value="filter.py&lt;div&gt;filter_single_band&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="350" y="195" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-43" parent="1" style="whiteSpace=wrap;html=1;" value="Numpy - SciPy - sounddevice - soundfile" vertex="1">
+          <mxGeometry height="60" width="120" x="-10" y="1010" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-78" edge="1" parent="1" source="ZiEeveE4ZL_LOoTnfZXo-75" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=light-dark(#000000,#FFFF00);" target="ZiEeveE4ZL_LOoTnfZXo-23">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-125" edge="1" parent="1" source="ZiEeveE4ZL_LOoTnfZXo-75" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;strokeColor=light-dark(#000000,#00CC00);" target="ZiEeveE4ZL_LOoTnfZXo-22">
+          <mxGeometry relative="1" x="0.066" as="geometry">
+            <Array as="points">
+              <mxPoint x="861.8" y="670" />
+              <mxPoint x="1030" y="670" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-130" edge="1" parent="1" source="ZiEeveE4ZL_LOoTnfZXo-75" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=light-dark(#9673A6,#990099);" target="ZiEeveE4ZL_LOoTnfZXo-21" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="844.5" y="720" />
+              <mxPoint x="883" y="720" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-131" edge="1" parent="1" source="ZiEeveE4ZL_LOoTnfZXo-75" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;strokeColor=light-dark(#000000,#FFFF00);" target="ZiEeveE4ZL_LOoTnfZXo-24">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="810" y="670" />
+              <mxPoint x="724.5" y="670" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-75" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Validan datos con" vertex="1">
+          <mxGeometry height="30" width="69" x="810" y="630" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-76" edge="1" parent="1" source="ZiEeveE4ZL_LOoTnfZXo-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=light-dark(#000000,#FFFF00);" target="ZiEeveE4ZL_LOoTnfZXo-75" value="">
+          <mxGeometry relative="1" x="0.3533" as="geometry">
+            <Array as="points">
+              <mxPoint x="785" y="560" />
+              <mxPoint x="844.5" y="560" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-86" edge="1" parent="1" source="ZiEeveE4ZL_LOoTnfZXo-36" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=light-dark(#9673A6,#990099);" target="ZiEeveE4ZL_LOoTnfZXo-43">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-70" y="1030" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-122" edge="1" parent="1" source="ZiEeveE4ZL_LOoTnfZXo-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.25;entryY=0;entryDx=0;entryDy=0;strokeColor=light-dark(#000000,#00CC00);" target="ZiEeveE4ZL_LOoTnfZXo-75">
+          <mxGeometry relative="1" x="0.4244" as="geometry">
+            <Array as="points">
+              <mxPoint x="581" y="600" />
+              <mxPoint x="827.3" y="600" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-136" edge="1" parent="1" source="ZiEeveE4ZL_LOoTnfZXo-134" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=light-dark(#000000,#00CC00);" target="ZiEeveE4ZL_LOoTnfZXo-39">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="270" y="730" />
+              <mxPoint x="180" y="730" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-148" edge="1" parent="1" source="ZiEeveE4ZL_LOoTnfZXo-134" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=light-dark(#000000,#FFFF00);" target="ZiEeveE4ZL_LOoTnfZXo-41">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="280" y="730" />
+              <mxPoint x="429" y="730" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-150" edge="1" parent="1" source="ZiEeveE4ZL_LOoTnfZXo-134" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=light-dark(#9673A6,#990099);" target="ZiEeveE4ZL_LOoTnfZXo-35">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="265" y="720" />
+              <mxPoint x="-70" y="720" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-134" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Lllaman a" vertex="1">
+          <mxGeometry height="30" width="60" x="250" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-135" edge="1" parent="1" source="ZiEeveE4ZL_LOoTnfZXo-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.25;entryDx=0;entryDy=0;strokeColor=light-dark(#000000,#00CC00);" target="ZiEeveE4ZL_LOoTnfZXo-134">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="580" y="600" />
+              <mxPoint x="310" y="600" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-146" edge="1" parent="1" source="ZiEeveE4ZL_LOoTnfZXo-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.25;entryDx=0;entryDy=0;strokeColor=light-dark(#9673A6,#990099);" target="ZiEeveE4ZL_LOoTnfZXo-75">
+          <mxGeometry relative="1" x="0.0993" as="geometry">
+            <Array as="points">
+              <mxPoint x="220" y="540" />
+              <mxPoint x="460" y="540" />
+              <mxPoint x="460" y="637.5" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-147" edge="1" parent="1" source="ZiEeveE4ZL_LOoTnfZXo-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.65;entryY=0.044;entryDx=0;entryDy=0;entryPerimeter=0;strokeColor=light-dark(#000000,#FFFF00);" target="ZiEeveE4ZL_LOoTnfZXo-134">
+          <mxGeometry relative="1" x="0.1329" as="geometry">
+            <Array as="points">
+              <mxPoint x="785" y="522.5" />
+              <mxPoint x="785" y="560" />
+              <mxPoint x="289" y="560" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-151" edge="1" parent="1" source="ZiEeveE4ZL_LOoTnfZXo-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=light-dark(#9673A6,#990099);" target="ZiEeveE4ZL_LOoTnfZXo-134">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-153" parent="1" style="whiteSpace=wrap;html=1;" value="FastAPI - Pydantic" vertex="1">
+          <mxGeometry height="60" width="120" x="-90" y="600" as="geometry" />
+        </mxCell>
+        <mxCell id="ZiEeveE4ZL_LOoTnfZXo-154" edge="1" parent="1" source="ZiEeveE4ZL_LOoTnfZXo-59" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="ZiEeveE4ZL_LOoTnfZXo-153">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

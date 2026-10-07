@@ -1,17 +1,21 @@
-# RIR-API
+# RIR-RAR
 
 API REST para procesamiento y analisis de respuestas al impulso segun la norma ISO 3382.
 
 <!-- Badge de CI: reemplazar <usuario>/<repo> por los datos del repositorio del grupo -->
-![CI](https://github.com/<usuario>/<repo>/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/<Cadirola24>/<rir-rar>/actions/workflows/ci.yml/badge.svg)
 ![Python](https://img.shields.io/badge/python-3.12+-blue.svg)
 
 ## Descripcion
 
-RIR-API es el trabajo practico de Senales y Sistemas (UNTREF, 2C 2026): una API REST
-(FastAPI) con la cadena completa de procesamiento acustico, desde la generacion de senales
-de excitacion hasta el calculo de parametros acusticos (EDT, T20, T30, D50, C80) segun
-ISO 3382-1.
+En este trabajo práctrico de Señales y Sistemas de UNTREF se desarollará una API REST diseñada para el procesamiento y 
+análisis de respuestas al impulso en recintos (RIR). 
+Esta herramienta permite recibir archivos de audio con señales acústicas y procesarlas 
+para calcular parámetros definidos por la norma ISO 3382-1, tales como el tiempo de reverberación (T20, T30), el tiempo de 
+decaimiento temprano (EDT), indice de claridad (C80) y el indice de definición (D50).
+El objetivo principal es brindar una interfaz de programación que automatice la cadena completa de análisis y procesamiento acústico: 
+desde la limpieza y filtrado de la señal de excitación, hasta la obtención de datos para la evaluación y analisis de la actividad sonora de salas.
+
 
 - Consigna, especificaciones y ruta del TP: <https://maxiyommi.github.io/signal-systems/trabajo_practico/ruta/>
 - API de referencia de la catedra (Swagger UI): <https://rir-api.onrender.com/docs>
@@ -24,8 +28,9 @@ ISO 3382-1.
 
 | Nombre | Legajo | Rol |
 |--------|--------|-----|
-| ...    | ...    | ... |
-
+|Cadirola Valentino|80692|Dev|
+|Collado Vicente|80478|Reviewer / QA|
+|Pascuccelli Tadeos|72794|Integrador|
 ## Requisitos previos
 
 - Python 3.12 o superior
@@ -126,6 +131,8 @@ rir-api/
 Cada milestone expone lo que construye: los routers y schemas de `signals` se agregan en M1
 (y suman `synthetic-ir` en M2), los de `filters` en M2 y los de `acoustics` y `utils` en M3
 (ver los `TODO` en `app/main.py`).
+
+![Diagrama de Arquitectura](docs/diagrama_arquitectura.png)
 
 ## Milestones y entregas (2C 2026)
 
