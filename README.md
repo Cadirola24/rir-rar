@@ -20,10 +20,6 @@ desde la limpieza y filtrado de la señal de excitación, hasta la obtención de
 - Consigna, especificaciones y ruta del TP: <https://maxiyommi.github.io/signal-systems/trabajo_practico/ruta/>
 - API de referencia de la catedra (Swagger UI): <https://rir-api.onrender.com/docs>
 
-> Este README es un punto de partida: el grupo lo completa en M0 (integrantes, roles,
-> diagrama de arquitectura, branching strategy) y lo va actualizando hasta M3 (seccion
-> "Validacion" con los resultados).
-
 ## Integrantes
 
 | Nombre | Legajo | Rol |
