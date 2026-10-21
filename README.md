@@ -3,7 +3,7 @@
 API REST para procesamiento y analisis de respuestas al impulso segun la norma ISO 3382.
 
 <!-- Badge de CI: reemplazar <usuario>/<repo> por los datos del repositorio del grupo -->
-![CI](https://github.com/<Cadirola24>/<rir-rar>/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/Cadirola24/rir-rar/actions/workflows/ci.yml/badge.svg)
 ![Python](https://img.shields.io/badge/python-3.12+-blue.svg)
 
 ## Descripción
@@ -25,15 +25,15 @@ desde la limpieza y filtrado de la señal de excitación, hasta la obtención de
 | Nombre | Legajo | Rol |
 |--------|--------|-----|
 |Cadirola Valentino|80692|Dev|
-|Collado Vicente|80478|Reviewer / QA|
-|Pascuccelli Tadeos|72794|Integrador|
+|Collado Horlent Vicente|80478|Reviewer / QA|
+|Pascuccelli Tadeo|72794|Integrador|
 ## Requisitos previos
 
 - Python 3.12 o superior
 - [uv](https://docs.astral.sh/uv/) (gestor de paquetes y entornos virtuales)
 - git y una cuenta de GitHub
 
-## Arranque: crear el repositorio del grupo
+## Crear el repositorio del grupo
 
 Cada grupo trabaja en **un repositorio nuevo propio** y copia adentro el contenido de este
 template (no es un fork).
