@@ -3,7 +3,7 @@
 API REST para procesamiento y analisis de respuestas al impulso segun la norma ISO 3382.
 
 <!-- Badge de CI: reemplazar <usuario>/<repo> por los datos del repositorio del grupo -->
-![CI](https://github.com/<Cadirola24>/<rir-rar>/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/Cadirola24/rir-rar/actions/workflows/ci.yml/badge.svg)
 ![Python](https://img.shields.io/badge/python-3.12+-blue.svg)
 
 ## Descripción
@@ -25,48 +25,20 @@ desde la limpieza y filtrado de la señal de excitación, hasta la obtención de
 | Nombre | Legajo | Rol |
 |--------|--------|-----|
 |Cadirola Valentino|80692|Dev|
-|Collado Vicente|80478|Reviewer / QA|
-|Pascuccelli Tadeos|72794|Integrador|
+|Collado Horlent Vicente|80478|Reviewer / QA|
+|Pascuccelli Tadeo|72794|Integrador|
 ## Requisitos previos
 
 - Python 3.12 o superior
 - [uv](https://docs.astral.sh/uv/) (gestor de paquetes y entornos virtuales)
 - git y una cuenta de GitHub
 
-## Arranque: crear el repositorio del grupo
-
-Cada grupo trabaja en **un repositorio nuevo propio** y copia adentro el contenido de este
-template (no es un fork).
-
-1. Una persona del grupo crea en GitHub un repositorio **vacio** (por ejemplo `rir-api`,
-   sin README ni .gitignore) y agrega al resto del grupo y a los docentes
-   (**@maxiyommi** y **@jero-scafati**) como colaboradores
-   (*Settings → Collaborators → Add people*).
-2. Copiar el template y hacer el primer commit:
-
-```bash
-# Bajar el repositorio de la materia (solo la ultima version)
-git clone --depth 1 https://github.com/maxiyommi/signal-systems.git
-
-# Clonar el repositorio (vacio) del grupo
-git clone https://github.com/<usuario>/rir-api.git
-
-# Copiar el contenido del template (incluye archivos ocultos: .github/, .gitignore)
-cp -r signal-systems/trabajo_practico/template_repo/. rir-api/
-
-cd rir-api
-git add .
-git commit -m "chore: estructura inicial desde el template de la catedra"
-git branch -M main
-git push -u origin main
-```
-
-3. El resto del grupo clona `rir-api` y listo. La carpeta `signal-systems/` se puede borrar.
-
 ## Instalacion y ejecucion
 
 ```bash
 # Crear el entorno e instalar dependencias (incluye las de desarrollo: pytest, ruff, ...)
+git clone https://github.com/Cadirola24/rir-rar
+cd rir-rar
 uv sync
 
 # Iniciar la API con hot-reload
@@ -87,7 +59,7 @@ repositorio del grupo para que todos (y el CI) usen las mismas versiones.
 ## Estructura del proyecto
 
 ```
-rir-api/
+rir-rar/
 ├── app/
 │   ├── __init__.py
 │   ├── main.py                    # Punto de entrada FastAPI (/ y /health)
@@ -117,11 +89,14 @@ rir-api/
 │   └── test_api.py                # Tests de endpoints, por milestone (M0 a M3)
 ├── data/                          # Mediciones y audios locales (ignorado por git)
 ├── docs/
-│   └── README.md                  # Guia para la documentacion (graficas de validacion, etc.)
+│   ├── README.md                  # Guia para la documentacion (graficas de validacion, etc.)
+    ├── arquitectura.drawio        # Diagrama de la arquitectura de la api
+    └── diagrama_arquitectura.png  # Diagrama en formato .png
 ├── .github/workflows/ci.yml       # CI: ruff + pytest en cada push/PR
 ├── .gitignore
 ├── pyproject.toml                 # Dependencias y configuracion (ruff, pytest)
-└── README.md
+├── README.md
+└── AI_LOG.md                      # Documentación de uso de IA
 ```
 
 Cada milestone expone lo que construye: los routers y schemas de `signals` se agregan en M1
