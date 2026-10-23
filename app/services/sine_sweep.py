@@ -7,9 +7,12 @@ import numpy as np
 
 
 def generate_sine_sweep_pair(
-    duration: float, f1: float, f2: float, fs: int
+    duration: float,
+    f1: float = 20.0,
+    f2: float = 20000.0,
+    fs: int = 44100,
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Genera un barrido senoidal logaritmico (sine sweep) y su filtro inverso.
+    """Genera un barrido senoidal logaritmico y su filtro inverso.
 
     El sweep es ``x(t) = sin[2*pi*f1*T / ln(f2/f1) * (exp(t*ln(f2/f1)/T) - 1)]``
     y el filtro inverso es el sweep invertido en el tiempo con correccion de
@@ -39,4 +42,21 @@ def generate_sine_sweep_pair(
     .. [1] Farina, A. (2000). "Simultaneous measurement of impulse response
        and distortion with a swept-sine technique." 108th AES Convention.
     """
-    raise NotImplementedError("Implementar en Milestone 1")
+    # Vector de tiempo (t) desde 0 hasta T
+    num_samples = int(duration * fs)
+    t = np.linspace(0, duration, num_samples, endpoint=False)
+
+    # Constantes de la función
+    t_tot = duration
+    log_ratio = np.log(f2 / f1)
+    k_const = (2 * np.pi * f1 * t_tot) / log_ratio
+
+    # Generación del Sine Sweep: x(t)
+    sweep = np.sin(k_const * (np.exp(t * log_ratio / t_tot) - 1))
+
+    # Generación del Filtro Inverso: x(T - t) * A(t)
+    sweep_reversed = sweep[::-1]  # Sweep invertido en el tiempo
+    env = np.exp(-t * log_ratio / t_tot)  # Envolvente de atenuación
+    inverse_filter = sweep_reversed * env  # Multiplicacion por A para evitar refuerzo en graves
+
+    return sweep, inverse_filter
