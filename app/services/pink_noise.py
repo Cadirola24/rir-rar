@@ -9,23 +9,6 @@ import numpy as np
 def generate_pink_noise(duration: float, fs: int) -> np.ndarray:
     """Genera una senal de ruido rosa de la duracion especificada.
 
-    El ruido rosa tiene una densidad espectral de potencia inversamente
-    proporcional a la frecuencia (1/f): cae -3 dB/octava, de modo que cada
-    octava contiene la misma energia. Por eso es util para mediciones acusticas.
-
-    Algoritmo recomendado: **Voss-McCartney**.
-
-    1. Definir ``N_bits`` generadores de ruido blanco (tipicamente 16-20).
-    2. Para cada muestra ``n``, actualizar el generador ``i`` cuando el bit ``i``
-       de ``n`` cambia respecto de ``n - 1`` (el generador ``i`` se actualiza
-       cada ``2**i`` muestras).
-    3. Sumar las salidas de todos los generadores.
-    4. Normalizar la senal resultante al rango [-1, 1].
-
-    Alternativa aceptable: generar ruido blanco y filtrarlo en frecuencia con
-    ``H(f) = 1/sqrt(f)`` (``np.fft.rfft`` -> dividir por ``sqrt(f)`` omitiendo
-    ``f = 0`` -> ``np.fft.irfft`` -> normalizar).
-
     Parameters
     ----------
     duration : float
@@ -36,13 +19,42 @@ def generate_pink_noise(duration: float, fs: int) -> np.ndarray:
     Returns
     -------
     np.ndarray
-        Senal de ruido rosa normalizada entre -1 y 1, de longitud
-        ``int(duration * fs)``.
-
-    References
-    ----------
-    .. [1] Voss, R. F. & Clarke, J. (1978). "1/f noise" in music: Music from
-       1/f noise. JASA 63(1), 258-263.
-    .. [2] https://www.firstpr.com.au/dsp/pink-noise/
+        Ruido rosa normalizado entre -1 y 1, de largo int(duration * fs).
     """
-    raise NotImplementedError("Implementar en Milestone 1")
+    N = int(duration * fs)
+    n_gen = 16
+
+    # 1. Salida y generadores de ruido blanco con distribución uniforme entre -1 y 1
+    out = np.zeros(N)
+    gens = np.random.uniform(-1.0, 1.0, n_gen)
+
+    # Mantenemos la suma actual en una variable para no recalcular sum(gens) en cada iteración
+    current_sum = np.sum(gens)
+
+    # 2. Algoritmo de McCartney
+    for n in range(1, N + 1):
+        # Ruido blanco que se suma en cada muestra
+        white_noise = np.random.randn()
+
+        # Cada muestra es la suma de los generadores lentos y el ruido rápido
+        out[n - 1] = current_sum + white_noise
+
+        # 3. Encontrar el generador a renovar
+        idx = (n & -n).bit_length() - 1
+
+        # 4. Renovar el valor del generador si corresponde
+        if idx < n_gen:
+            current_sum -= gens[idx]  # Restar valor viejo
+            new_val = np.random.randn()  # Nuevo ruido blanco
+            gens[idx] = new_val  # Guardar en el arreglo
+            current_sum += new_val  # Sumar nuevo valor
+
+    # 5. Restar la media
+    out = out - np.mean(out)
+
+    # 6. Normalizar
+    max_val = np.max(np.abs(out))
+    if max_val > 0:
+        out = out / max_val
+
+    return out
