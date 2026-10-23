@@ -84,7 +84,7 @@ def test_wav_response_roundtrip():
 # ── M1 ───────────────────────────────────────────────────────────────────────
 
 
-@xfail_m1
+
 def test_signals_pink_noise_endpoint():
     """/api/v1/signals/pink-noise genera y devuelve un WAV valido."""
     response = client.post(

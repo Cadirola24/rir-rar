@@ -232,3 +232,11 @@ o con un archivo `.env` en la raiz (ignorado por git).
 - Schroeder, M. R. (1965). *New method of measuring reverberation time.* JASA 37(3).
 - [FastAPI](https://fastapi.tiangolo.com/) · [Pydantic](https://docs.pydantic.dev/) ·
   [uv](https://docs.astral.sh/uv/)
+
+## Evidencias de Validación - Milestone 1
+
+### Espectrograma del Sine Sweep
+![Espectrograma del Sweep](docs/m1/espectrograma_sweep.png)
+
+### Convolución Sweep * Filtro Inverso (Respuesta al Impulso)
+![Convolución Impulso](docs/m1/convolucion_impulso.png)
