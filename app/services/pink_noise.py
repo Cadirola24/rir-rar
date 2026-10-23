@@ -21,18 +21,18 @@ def generate_pink_noise(duration: float, fs: int) -> np.ndarray:
     np.ndarray
         Ruido rosa normalizado entre -1 y 1, de largo int(duration * fs).
     """
-    N = int(duration * fs)
+    n_tot = int(duration * fs)
     n_gen = 16
 
     # 1. Salida y generadores de ruido blanco con distribución uniforme entre -1 y 1
-    out = np.zeros(N)
+    out = np.zeros(n_tot)
     gens = np.random.uniform(-1.0, 1.0, n_gen)
 
     # Mantenemos la suma actual en una variable para no recalcular sum(gens) en cada iteración
     current_sum = np.sum(gens)
 
     # 2. Algoritmo de McCartney
-    for n in range(1, N + 1):
+    for n in range(1, n_tot + 1):
         # Ruido blanco que se suma en cada muestra
         white_noise = np.random.randn()
 
