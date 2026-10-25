@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def play_and_record(signal: np.ndarray, fs: int, record_duration: float) -> np.ndarray:
     """Reproduce una señal y graba simultáneamente.
 
