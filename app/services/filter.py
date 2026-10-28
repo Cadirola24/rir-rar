@@ -4,7 +4,7 @@ Milestone 2: Procesamiento de la respuesta al impulso.
 """
 
 import numpy as np
-
+from scipy.signal import butter, sosfiltfilt
 
 def filter_single_band(
     signal: np.ndarray, fs: int, center_freq: float, order: int = 4
@@ -36,5 +36,30 @@ def filter_single_band(
     -------
     np.ndarray
         Senal filtrada (array 1D, misma longitud que ``signal``).
+
+        Raises
+    ------
+    ValueError
+        Si la frecuencia superior de la banda excede o iguala el limite de Nyquist (fs / 2)
+        o si las frecuencias son invalidas.
     """
-    raise NotImplementedError("Implementar en Milestone 2")
+    f_inf = center_freq / np.sqrt(2)
+    f_sup = center_freq * np.sqrt(2)
+    nyquist = fs / 2.0
+
+    # Validacion del limite de Nyquist
+    if f_sup >= nyquist:
+        raise ValueError(
+            f"La frecuencia superior de la banda ({f_sup:.1f} Hz) excede el limite de Nyquist ({nyquist:.1f} Hz)."
+        )
+
+    if f_inf <= 0:
+        raise ValueError(f"Frecuencia central o inferior invalida: {center_freq} Hz")
+
+    # Diseno del filtro en formato SOS (secciones de segundo orden)
+    sos = butter(N=order, Wn=[f_inf, f_sup], btype="bandpass", fs=fs, output="sos")
+
+    # Filtrado en fase cero
+    filtered_signal = sosfiltfilt(sos, signal)
+
+    return filtered_signal
