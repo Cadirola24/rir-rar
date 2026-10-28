@@ -122,7 +122,6 @@ def test_invalid_duration_returns_422():
 # ── M2 ───────────────────────────────────────────────────────────────────────
 
 
-@xfail_m2
 def test_signals_synthetic_ir_endpoint():
     """/api/v1/signals/synthetic-ir devuelve una RI en WAV con la duracion pedida."""
     pedido = {"duration": 1.0, "t60_values": {"1000": 0.8}, "sample_rate": 44100}
@@ -133,7 +132,6 @@ def test_signals_synthetic_ir_endpoint():
     assert len(senal) == 44100
 
 
-@xfail_m2
 def test_filters_single_band_endpoint():
     """/api/v1/filters/single-band recibe un WAV y devuelve la banda filtrada."""
     fs = 44100
@@ -148,7 +146,6 @@ def test_filters_single_band_endpoint():
     assert len(filtrada) == fs
 
 
-@xfail_m2
 def test_invalid_file_returns_422():
     """Un archivo que no es audio devuelve 422 Unprocessable Entity."""
     archivos = {"file": ("no_es_audio.wav", b"esto no es audio", "audio/wav")}

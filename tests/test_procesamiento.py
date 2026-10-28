@@ -20,9 +20,8 @@ from app.services.signal_utils import (
 )
 from app.services.sine_sweep import generate_sine_sweep_pair
 
-pytestmark = pytest.mark.xfail(
-    raises=NotImplementedError, strict=False, reason="se implementa en M2"
-)
+#pytestmark = pytest.mark.xfail(
+#    raises=NotImplementedError, strict=False, reason="se implementa en M2")
 
 
 def _t60_desde_schroeder(ir: np.ndarray, fs: int) -> float:
