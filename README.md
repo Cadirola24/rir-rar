@@ -240,3 +240,6 @@ o con un archivo `.env` en la raiz (ignorado por git).
 
 ### Convolución Sweep * Filtro Inverso (Respuesta al Impulso)
 ![Convolución Impulso](docs/m1/convolucion_impulso.png)
+
+### Prueba de Reproducción y Grabación Simultánea
+![Prueba de Grabación Real](docs/m1/prueba_grabacion.png)
