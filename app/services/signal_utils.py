@@ -7,8 +7,10 @@ from pathlib import Path
 
 import numpy as np
 import soundfile as sf
-from app.services.filter import filter_single_band
 from scipy.signal import fftconvolve
+
+from app.services.filter import filter_single_band
+
 
 def load_audio(path: str | Path) -> tuple[np.ndarray, int]:
     """Carga un archivo de audio (al menos WAV y FLAC) y retorna senal y fs.
@@ -117,7 +119,11 @@ def generate_synthetic_ir(duration: float, t60_values: dict[float, float], fs: i
     return synthetic_ir
 
 
-def get_impulse_response(recording: np.ndarray, inverse_filter: np.ndarray, fs: int = 44100) -> np.ndarray:
+def get_impulse_response(
+    recording: np.ndarray,
+    inverse_filter: np.ndarray,
+    fs: int = 44100,
+) -> np.ndarray:
     """Obtiene la respuesta al impulso mediante deconvolucion de un sine sweep.
 
     ``h(t) = y(t) * x_inv(t)``, con ``y = recording`` y ``x_inv = inverse_filter``;

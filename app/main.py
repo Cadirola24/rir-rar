@@ -8,7 +8,7 @@ Uso:
 
 from fastapi import FastAPI
 
-from app.routers import health, signals, filters
+from app.routers import filters, health, signals
 from app.settings import settings
 
 app = FastAPI(

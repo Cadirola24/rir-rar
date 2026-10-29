@@ -6,6 +6,7 @@ Milestone 2: Procesamiento de la respuesta al impulso.
 import numpy as np
 from scipy.signal import butter, sosfiltfilt
 
+
 def filter_single_band(
     signal: np.ndarray, fs: int, center_freq: float, order: int = 4
 ) -> np.ndarray:
@@ -50,7 +51,8 @@ def filter_single_band(
     # Validacion del limite de Nyquist
     if f_sup >= nyquist:
         raise ValueError(
-            f"La frecuencia superior de la banda ({f_sup:.1f} Hz) excede el limite de Nyquist ({nyquist:.1f} Hz)."
+           f"La frecuencia superior de la banda ({f_sup:.1f} Hz) "
+                f"excede el limite de Nyquist ({nyquist:.1f} Hz)."
         )
 
     if f_inf <= 0:

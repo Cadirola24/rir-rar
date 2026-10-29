@@ -243,3 +243,33 @@ o con un archivo `.env` en la raiz (ignorado por git).
 
 ### Prueba de Reproducción y Grabación Simultánea
 ![Prueba de Grabación Real](docs/m1/prueba_grabacion.png)
+
+## Evidencias de Validación - Milestone 2
+
+### Endpoints Integrados
+- `POST /api/v1/filters/single-band`: Filtrado pasabanda por octava mediante filtros SOS IIR.
+- `POST /api/v1/signals/synthetic-ir`: Generación de Respuesta al Impulso sintética parametrizada por $T_{60}$.
+
+### Métricas de Calidad y Cobertura
+- **Cobertura de Tests (`pytest`):** **93%** en `app/services` (exigido $\ge 80\%$).
+- **Formato y Linteo (`ruff`):** 0 errores / 0 advertencias (`All checks passed!`).
+- **Correlación de Pearson ($r$):** **$r = 0.9999$** en deconvolución sintética (exigido $r > 0.9$).
+
+---
+
+### Evidencias visuales (`docs/m2/`)
+
+#### 1. Deconvolución de RI Sintética
+Superposición temporal entre la RI sintética original y la recuperada tras convolución con *sine sweep* y filtrado inverso (alineación compensada por correlación cruzada):
+
+![Deconvolución RI Sintética](docs/m2/ri_sintetica_deconvolucion.png)
+
+#### 2. Procesamiento de RI Real (T60 Corto)
+Forma de onda, respuesta en frecuencia e iluminación de la banda pasante en 1 kHz, y curva de decaimiento en dB para un recinto de reverberación corta:
+
+![Análisis RI Real Corta](docs/m2/ri_real_corta.png)
+
+#### 3. Procesamiento de RI Real (T60 Largo)
+Forma de onda, respuesta en frecuencia e iluminación de la banda pasante en 1 kHz, y curva de decaimiento en dB para un recinto de reverberación larga:
+
+![Análisis RI Real Larga](docs/m2/ri_real_larga.png)
