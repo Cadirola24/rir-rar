@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field, PositiveFloat
 
+
 class PinkNoiseRequest(BaseModel):
     duration: float = Field(gt=0, le=60)            # segundos
     sample_rate: int = Field(default=44100, ge=8000, le=192000)
