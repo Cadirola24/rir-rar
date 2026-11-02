@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import fftconvolve
@@ -115,7 +116,7 @@ def process_synthetic_deconvolution():
 
     # 6. Calcular Correlación de Pearson alineada
     r = np.corrcoef(ir1, ir2)[0, 1]
-    print(f"\n--- Validación RI Sintética ---")
+    print("\n--- Validación RI Sintética ---")
     print(f"Retardo detectado: {delay} muestras")
     print(f"Coeficiente de correlación (r): {r:.5f}")
     if r > 0.9:
