@@ -137,8 +137,8 @@ rir-rar/
 │   │   ├── __init__.py
 │   │   ├── health.py              # GET /health (M0)
 │   │   ├── audio_http.py          # wav_response y uploaded_file (ya resueltas)
-│   │   ├── signals.py             # PinkNoiseRequest, SineSweepRequest y SyntheticIRRequest
-│   │   └── filters.py             # single_band
+│   │   ├── signals.py             # POST /api/v1/signals/pink-noise, POST /api/v1/signals/sine-sweep y POST /api/v1/signals/synthetic-ir
+│   │   └── filters.py             # POST /api/v1/filters/single-band
 │   ├── schemas/
 │   │   ├── __init__.py            # Modelos Pydantic de request/response (desde M1)
 │   │   └── signals.py             # PinkNoiseRequest, SineSweepRequest y SyntheticIRRequest
@@ -162,13 +162,17 @@ rir-rar/
 ├── data/                          # Mediciones y audios locales (ignorado por git)
 ├── docs/
 │   ├── README.md                  # Guia para la documentacion (graficas de validacion, etc.)
-    ├── arquitectura.drawio        # Diagrama de la arquitectura de la api
-    └── diagrama_arquitectura.png  # Diagrama en formato .png
+│   ├── arquitectura.drawio        # Diagrama de la arquitectura de la api
+│   ├── diagrama_arquitectura.png  # Diagrama en formato .png
+│   ├── m1/                        # Documentación de funcionamiento de M1
+│   └── m2/                        # Documentación de funcionamiento de M2
 ├── .github/workflows/ci.yml       # CI: ruff + pytest en cada push/PR
 ├── .gitignore
 ├── pyproject.toml                 # Dependencias y configuracion (ruff, pytest)
 ├── README.md
-└── AI_LOG.md                      # Documentación de uso de IA
+├── AI_LOG.md                      # Documentación de uso de IA
+├── generate_evidences.py          # Generación de documentación para M1
+└── generate_evidences_m2.py       # Generación de documentación para M2
 ```
 
 Cada milestone expone lo que construye: los routers y schemas de `signals` se agregan en M1
