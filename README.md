@@ -22,11 +22,11 @@ desde la limpieza y filtrado de la señal de excitación, hasta la obtención de
 
 ## Integrantes
 
-| Nombre | Legajo | Rol |
-|--------|--------|-----|
-|Cadirola Valentino|80692|Dev|
-|Collado Horlent Vicente|80478|Reviewer / QA|
-|Pascuccelli Tadeo|72794|Integrador|
+| Nombre | Legajo | Rol | Rol por área del TP |
+|--------|--------|-----|---------------------|
+|Cadirola Valentino|80692|Dev|Servicios, Routers y Schemas para M1, implementación principal de M2, generación de documentación para M1 y M2, Servicios y Routers para M3
+|Collado Horlent Vicente|80478|Reviewer / QA|Servicios M1, corrección de fallas en milestones previos, Review y Merge de Pull Request, Servicios y documentación para M3
+|Pascuccelli Tadeo|72794|Integrador| Servicios M1, Servicios y Schemas para M3, Review y corrección de bugs para M3 
 ## Requisitos previos
 
 - Python 3.12 o superior
@@ -56,6 +56,75 @@ La API queda disponible en `http://localhost:8000`. Documentacion interactiva:
 `uv sync` genera un `uv.lock` con las versiones exactas instaladas: **commitéenlo** en el
 repositorio del grupo para que todos (y el CI) usen las mismas versiones.
 
+## Uso de la API
+
+Servidor corriendo con `uv run uvicorn app.main:app --reload` antes de ejecutar los comandos en la terminal.
+
+### M1: Generación de Señales
+
+#### 1. Generar Ruido Rosa
+Genera una señal de ruido rosa (Voss-McCartney) y la guarda como `ruido_rosa.wav`.
+
+```bash
+curl -X 'POST' \
+  'http://localhost:8000/api/v1/signals/pink-noise' \
+  -H 'accept: audio/wav' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "duration": 2.0,
+  "sample_rate": 44100
+}' --output ruido_rosa.wav
+```
+
+#### 1. Generar Sine Sweep
+Genera un Sine Sweep logarítmico. Si el parámetro `inverse` es `true`, devuelve el filtro inverso
+
+```bash
+curl -X 'POST' \
+  'http://localhost:8000/api/v1/signals/sine-sweep' \
+  -H 'accept: audio/wav' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "duration": 5.0,
+  "start_freq": 20.0,
+  "end_freq": 20000.0,
+  "sample_rate": 44100,
+  "inverse": false
+}' --output sine_sweep.wav
+```
+
+### M2: Procesamiento de la RI
+
+#### 1. Generar Respuesta al Impulso (RI) Sintética
+Genera una RI sintética parametrizada por sus valores de decaimiento T60.
+
+```bash
+curl -X 'POST' \
+  'http://localhost:8000/api/v1/signals/synthetic-ir' \
+  -H 'accept: audio/wav' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "duration": 2.0,
+  "t60_values": {
+    "1000": 0.8
+  },
+  "sample_rate": 44100
+}' --output ri_sintetica.wav
+```
+
+#### 2. Filtrado por Banda
+Sube un archivo de audio WAV y devuelve la señal filtrada en la banda especificada.
+
+```bash
+curl -X 'POST' \
+  'http://localhost:8000/api/v1/filters/single-band' \
+  -H 'accept: audio/wav' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'file=@tests/data/thx-sound-test.wav' \
+  -F 'center_freq=1000' \
+  --output ir_filtrada.wav
+```
+
 ## Estructura del proyecto
 
 ```
@@ -67,9 +136,12 @@ rir-rar/
 │   ├── routers/
 │   │   ├── __init__.py
 │   │   ├── health.py              # GET /health (M0)
-│   │   └── audio_http.py          # wav_response y uploaded_file (ya resueltas)
+│   │   ├── audio_http.py          # wav_response y uploaded_file (ya resueltas)
+│   │   ├── signals.py             # PinkNoiseRequest, SineSweepRequest y SyntheticIRRequest
+│   │   └── filters.py             # single_band
 │   ├── schemas/
-│   │   └── __init__.py            # Modelos Pydantic de request/response (desde M1)
+│   │   ├── __init__.py            # Modelos Pydantic de request/response (desde M1)
+│   │   └── signals.py             # PinkNoiseRequest, SineSweepRequest y SyntheticIRRequest
 │   └── services/
 │       ├── __init__.py
 │       ├── pink_noise.py          # generate_pink_noise (M1)
@@ -243,6 +315,9 @@ o con un archivo `.env` en la raiz (ignorado por git).
 
 ### Prueba de Reproducción y Grabación Simultánea
 ![Prueba de Grabación Real](docs/m1/prueba_grabacion.png)
+
+### Espectro del Ruido Rosa (-3 dB/octava)
+![Espectro Ruido Rosa](docs/m1/espectro_ruido_rosa.png)
 
 ## Evidencias de Validación - Milestone 2
 

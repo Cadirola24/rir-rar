@@ -2,9 +2,10 @@ import os
 
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.signal import fftconvolve, spectrogram
+from scipy.signal import fftconvolve, spectrogram, welch
 
 from app.services.audio_io import play_and_record
+from app.services.pink_noise import generate_pink_noise
 from app.services.sine_sweep import generate_sine_sweep_pair
 
 
@@ -19,17 +20,13 @@ def main() -> None:
     # ---------------------------------------------------------
     # 1. Generar sweep y filtro inverso
     # ---------------------------------------------------------
-    sweep, inverse = generate_sine_sweep_pair(
-        duration=duration, f1=f1, f2=f2, fs=fs
-    )
+    sweep, inverse = generate_sine_sweep_pair(duration=duration, f1=f1, f2=f2, fs=fs)
 
     # ---------------------------------------------------------
     # 2. Espectrograma del Sine Sweep
     # ---------------------------------------------------------
     plt.figure(figsize=(10, 5))
-    frequencies, times, sxx = spectrogram(
-        sweep, fs=fs, nperseg=2048, noverlap=1024
-    )
+    frequencies, times, sxx = spectrogram(sweep, fs=fs, nperseg=2048, noverlap=1024)
 
     plt.pcolormesh(
         times,
@@ -91,18 +88,11 @@ def main() -> None:
     # ---------------------------------------------------------
     # 4. Pruebas de Reproducción y Grabación Simultánea (Servicio 3)
     # ---------------------------------------------------------
-    # ---------------------------------------------------------
-    # 4. Pruebas de Reproducción y Grabación Simultánea (Servicio 3)
-    # ---------------------------------------------------------
     test_duration = 3.0
-    sweep_test, _ = generate_sine_sweep_pair(
-        duration=test_duration, f1=100.0, f2=8000.0, fs=fs
-    )
+    sweep_test, _ = generate_sine_sweep_pair(duration=test_duration, f1=100.0, f2=8000.0, fs=fs)
 
     print("🔊 Reproduciendo y grabando en hardware real...")
-    recording = play_and_record(
-        sweep_test, fs, record_duration=test_duration + 0.5
-    )
+    recording = play_and_record(sweep_test, fs, record_duration=test_duration + 0.5)
 
     if recording.ndim > 1:
         recording = recording[:, 0]
@@ -119,7 +109,7 @@ def main() -> None:
 
     plt.figure(figsize=(10, 8))
 
-    # 1. Vista Global: Señal Emitida vs Grabada
+    # 4.1. Vista Global: Señal Emitida vs Grabada
     plt.subplot(3, 1, 1)
     plt.plot(t_emit, sweep_norm, color="#1f77b4", linewidth=0.3, label="Emitida")
     plt.title("Visión Global - Señal Emitida (Sine Sweep)")
@@ -135,7 +125,7 @@ def main() -> None:
     plt.ylim(-1.1, 1.1)
     plt.grid(True)
 
-    # 2. Detalle Zoom: 20 ms alrededor de t = 0.5 s para ver la senoidal
+    # 4.2. Detalle Zoom: 20 ms alrededor de t = 0.5 s para ver la senoidal
     t_start, t_end = 0.50, 0.52  # Ventana de 20 ms
     mask_emit = (t_emit >= t_start) & (t_emit <= t_end)
     mask_rec = (t_rec >= t_start) & (t_rec <= t_end)
@@ -156,7 +146,9 @@ def main() -> None:
         label="Grabada",
         linewidth=1.5,
     )
-    plt.title(f"Detalle Zoom (Ventana de 20 ms entre {t_start*1000:.0f} ms y {t_end*1000:.0f} ms)")
+    plt.title(
+        f"Detalle Zoom (Ventana de 20 ms entre {t_start * 1000:.0f} ms y {t_end * 1000:.0f} ms)"
+    )
     plt.xlabel("Tiempo (ms)")
     plt.ylabel("Amplitud")
     plt.legend(loc="upper right")
@@ -166,6 +158,60 @@ def main() -> None:
     plt.savefig("docs/m1/prueba_grabacion.png", dpi=300)
     plt.close()
     print("✔ Creado: docs/m1/prueba_grabacion.png")
+
+    # ---------------------------------------------------------
+    # 5. Espectro del Ruido Rosa (-3 dB / octava)
+    # ---------------------------------------------------------
+    print("📈 Generando gráfica de espectro para Ruido Rosa...")
+
+    # Generamos 10 segundos para tener buena resolución estadística
+    ruido_rosa = generate_pink_noise(duration=10.0, fs=fs)
+
+    # Calculamos la Densidad Espectral de Potencia (PSD) usando el método de Welch
+    f, pxx = welch(ruido_rosa, fs=fs, nperseg=8192)
+
+    # Trabajamos en escala logarítmica para dB
+    pxx_db = 10 * np.log10(pxx + 1e-10)
+
+    # Filtramos la banda de interés solicitada por la cátedra (100 Hz a 10 kHz)
+    banda = (f >= 100) & (f <= 10000)
+    f_banda = f[banda]
+    pxx_db_banda = pxx_db[banda]
+
+    # Calculamos la pendiente (dB/octava) usando el logaritmo en base 2 de la frecuencia
+    pendiente, ordenada = np.polyfit(np.log2(f_banda), pxx_db_banda, 1)
+
+    # Configuramos la gráfica
+    plt.figure(figsize=(10, 6))
+
+    # Graficamos el espectro real (con semilogx para que el eje X sea logarítmico)
+    plt.semilogx(f, pxx_db, color="#1f77b4", alpha=0.7, label="PSD de la señal generada")
+
+    # Graficamos la línea de tendencia ideal obtenida de la regresión
+    f_tendencia = np.linspace(100, 10000, 200)
+    linea_tendencia = pendiente * np.log2(f_tendencia) + ordenada
+    plt.semilogx(
+        f_tendencia,
+        linea_tendencia,
+        color="#d62728",
+        linewidth=2.5,
+        linestyle="--",
+        label=f"Regresión (Pendiente: {pendiente:.2f} dB/oct)",
+    )
+
+    # Formateo visual
+    plt.xlim(20, 22050)
+    plt.ylim(np.max(pxx_db) - 50, np.max(pxx_db) + 10)
+    plt.xlabel("Frecuencia (Hz)")
+    plt.ylabel("Densidad Espectral de Potencia (dB/Hz)")
+    plt.title("Validación Espectral de Ruido Rosa (Algoritmo Voss-McCartney)")
+    plt.legend(loc="upper right")
+    plt.grid(True, which="both", linestyle="--", alpha=0.5)
+
+    plt.tight_layout()
+    plt.savefig("docs/m1/espectro_ruido_rosa.png", dpi=300)
+    plt.close()
+    print("✔ Creado: docs/m1/espectro_ruido_rosa.png")
 
 
 if __name__ == "__main__":

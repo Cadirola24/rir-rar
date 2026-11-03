@@ -20,7 +20,7 @@ from app.services.signal_utils import (
 )
 from app.services.sine_sweep import generate_sine_sweep_pair
 
-#pytestmark = pytest.mark.xfail(
+# pytestmark = pytest.mark.xfail(
 #    raises=NotImplementedError, strict=False, reason="se implementa en M2")
 
 
