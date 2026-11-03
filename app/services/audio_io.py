@@ -32,9 +32,9 @@ def play_and_record(signal: np.ndarray, fs: int, record_duration: float) -> np.n
     if len(signal) < total_frames:
         pad_width = total_frames - len(signal)
         if signal.ndim == 1:
-            signal_padded = np.pad(signal, (0, pad_width), mode='constant')
+            signal_padded = np.pad(signal, (0, pad_width), mode="constant")
         else:
-            signal_padded = np.pad(signal, ((0, pad_width), (0, 0)), mode='constant')
+            signal_padded = np.pad(signal, ((0, pad_width), (0, 0)), mode="constant")
     else:
         signal_padded = signal[:total_frames]
 

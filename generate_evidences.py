@@ -19,17 +19,13 @@ def main() -> None:
     # ---------------------------------------------------------
     # 1. Generar sweep y filtro inverso
     # ---------------------------------------------------------
-    sweep, inverse = generate_sine_sweep_pair(
-        duration=duration, f1=f1, f2=f2, fs=fs
-    )
+    sweep, inverse = generate_sine_sweep_pair(duration=duration, f1=f1, f2=f2, fs=fs)
 
     # ---------------------------------------------------------
     # 2. Espectrograma del Sine Sweep
     # ---------------------------------------------------------
     plt.figure(figsize=(10, 5))
-    frequencies, times, sxx = spectrogram(
-        sweep, fs=fs, nperseg=2048, noverlap=1024
-    )
+    frequencies, times, sxx = spectrogram(sweep, fs=fs, nperseg=2048, noverlap=1024)
 
     plt.pcolormesh(
         times,
@@ -95,14 +91,10 @@ def main() -> None:
     # 4. Pruebas de Reproducción y Grabación Simultánea (Servicio 3)
     # ---------------------------------------------------------
     test_duration = 3.0
-    sweep_test, _ = generate_sine_sweep_pair(
-        duration=test_duration, f1=100.0, f2=8000.0, fs=fs
-    )
+    sweep_test, _ = generate_sine_sweep_pair(duration=test_duration, f1=100.0, f2=8000.0, fs=fs)
 
     print("🔊 Reproduciendo y grabando en hardware real...")
-    recording = play_and_record(
-        sweep_test, fs, record_duration=test_duration + 0.5
-    )
+    recording = play_and_record(sweep_test, fs, record_duration=test_duration + 0.5)
 
     if recording.ndim > 1:
         recording = recording[:, 0]
@@ -156,7 +148,9 @@ def main() -> None:
         label="Grabada",
         linewidth=1.5,
     )
-    plt.title(f"Detalle Zoom (Ventana de 20 ms entre {t_start*1000:.0f} ms y {t_end*1000:.0f} ms)")
+    plt.title(
+        f"Detalle Zoom (Ventana de 20 ms entre {t_start * 1000:.0f} ms y {t_end * 1000:.0f} ms)"
+    )
     plt.xlabel("Tiempo (ms)")
     plt.ylabel("Amplitud")
     plt.legend(loc="upper right")

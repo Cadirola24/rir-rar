@@ -42,19 +42,19 @@ def load_audio(path: str | Path) -> tuple[np.ndarray, int]:
     """
     path_obj = Path(path)
 
-        # 1. Verificar si el archivo existe antes de intentar leerlo
+    # 1. Verificar si el archivo existe antes de intentar leerlo
     if not path_obj.exists():
-            raise FileNotFoundError(f"El archivo especificado no existe: {path}")
+        raise FileNotFoundError(f"El archivo especificado no existe: {path}")
 
-        # 2. Intentar leer el audio con soundfile en float64
+    # 2. Intentar leer el audio con soundfile en float64
     try:
-            signal, fs = sf.read(path_obj, dtype="float64")
+        signal, fs = sf.read(path_obj, dtype="float64")
     except Exception as e:
-            raise ValueError(f"No se pudo leer el archivo de audio '{path_obj.name}': {e}") from e
+        raise ValueError(f"No se pudo leer el archivo de audio '{path_obj.name}': {e}") from e
 
-        # 3. Promediar a mono si tiene mas de 1 canal (estereo/multicanal)
+    # 3. Promediar a mono si tiene mas de 1 canal (estereo/multicanal)
     if signal.ndim > 1:
-            signal = signal.mean(axis=1)
+        signal = signal.mean(axis=1)
 
     return signal, int(fs)
 
@@ -161,7 +161,10 @@ def get_impulse_response(
     return trimmed_ir
 
 
-def logarithmic_scale_conversion(signal: np.ndarray, floor_db: float | None = None,) -> np.ndarray:
+def logarithmic_scale_conversion(
+    signal: np.ndarray,
+    floor_db: float | None = None,
+) -> np.ndarray:
     """Convierte una senal a escala logaritmica (dB) normalizada.
 
     ``L = 20 * log10(|x| / max(|x|))``. Evitar ``log(0)`` (usar un ``eps`` o
