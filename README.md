@@ -316,6 +316,9 @@ o con un archivo `.env` en la raiz (ignorado por git).
 ### Prueba de Reproducción y Grabación Simultánea
 ![Prueba de Grabación Real](docs/m1/prueba_grabacion.png)
 
+### Espectro del Ruido Rosa (-3 dB/octava)
+![Espectro Ruido Rosa](docs/m1/espectro_ruido_rosa.png)
+
 ## Evidencias de Validación - Milestone 2
 
 ### Endpoints Integrados

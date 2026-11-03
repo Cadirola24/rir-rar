@@ -43,3 +43,11 @@
 * **Prompt:** Solicitud para generar comandos `curl` actualizados y precisos, a partir de `main.py` y `signals.py`, extrayendo los nombres de los endpoints, las rutas correctas (`/api/v1/...`) y la estructura de los *schemas*.
 * **Fragmento de código generado:** Se generaron cuatro bloques de comandos `curl`. Se destacó la diferencia entre peticiones JSON (`application/json`) y la subida de archivos físicos (`multipart/form-data` usando `-F 'file=@ruta'`).
 * **Modificaciones:** Se añadió el sonido "THX Sound" en `tests/data` para validar el funcionamiento del filtro pasabanda. Los comandos fueron revisados para asegurar que los nombres de las variables coincidan exactamente con la implementación del código y que el formato del curl esté correctamente expresado en markdown.
+
+### Validación Gráfica del Ruido Rosa (`generate_evidences.py`)
+* **Fecha:** 2026-11-02
+* **Herramienta:** Gemini
+* **Problema:** Se necesitaba generar la evidencia visual para M1 que demostrara matemáticamente que el algoritmo de Voss-McCartney implementado produce un ruido rosa con la caída espectral correcta (aproximadamente -3 dB/octava).
+* **Prompt:** Solicitud para crear un bloque de código en Python que calcule y grafique el espectro del ruido rosa con su respectiva pendiente de regresión, para integrarlo al script existente `generate_evidences.py` y guardar la imagen en `docs/m1`.
+* **Fragmento de código generado:** Se proporcionó un bloque de código que utiliza `scipy.signal.welch` para calcular la Densidad Espectral de Potencia (PSD) y `np.polyfit` para realizar la regresión lineal entre las frecuencias de 100 Hz y 10 kHz. Se utilizó `matplotlib` con ejes semilogarítmicos (`semilogx`) para trazar la señal generada frente a la línea de tendencia ideal.
+* **Modificaciones:** Al integrar el código generado, se detectó una discrepancia en los argumentos (el código generado usaba `sample_rate`, pero la función original esperaba `fs`). Se corrigió el argumento manualmente a `fs=fs` para evitar un `TypeError`. Posteriormente, se ejecutó exitosamente el script aislando las dependencias mediante el comando `uv run python`.
