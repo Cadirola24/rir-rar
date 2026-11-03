@@ -35,3 +35,11 @@
 * **Prompt:** Creación del script `generate_evidences_m2.py`, reconciliación de las importaciones internas del módulo (`audio_io`, `sine_sweep`, `signal_utils`, `filter`) y resolución del desfase de muestras que daba $r = 0.04$.
 * **Fragmento de código generado:** Lógica de procesamiento espectral FFT y decaimiento en dB, junto con la alineación de señales mediante correlación cruzada (`np.correlate`) previa al cálculo de Pearson.
 * **Modificaciones:** Se corrigieron las rutas de importación de acuerdo a la estructura del repositorio y se compensó el retardo de la convolución/filtro inverso, alcanzando una correlación de $r = 0.9999$ y guardando los gráficos `ri_sintetica_deconvolucion.png`, `ri_real_corta.png` y `ri_real_larga.png` en `docs/m2/`.
+
+### Ejemplo de comandos curl (`README.md`)
+* **Fecha:** 2026-11-02
+* **Herramienta:** Gemini
+* **Problema:** Se necesitaba documentar el uso de los endpoints de la API (Ruido Rosa, Sine Sweep, RI Sintética y Filtrado por Banda) en el README utilizando comandos `curl`.
+* **Prompt:** Solicitud para generar comandos `curl` actualizados y precisos, a partir de `main.py` y `signals.py`, extrayendo los nombres de los endpoints, las rutas correctas (`/api/v1/...`) y la estructura de los *schemas*.
+* **Fragmento de código generado:** Se generaron cuatro bloques de comandos `curl`. Se destacó la diferencia entre peticiones JSON (`application/json`) y la subida de archivos físicos (`multipart/form-data` usando `-F 'file=@ruta'`).
+* **Modificaciones:** Se añadió el sonido "THX Sound" en `tests/data` para validar el funcionamiento del filtro pasabanda. Los comandos fueron revisados para asegurar que los nombres de las variables coincidan exactamente con la implementación del código y que el formato del curl esté correctamente expresado en markdown.
