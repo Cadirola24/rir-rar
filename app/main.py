@@ -21,10 +21,13 @@ app = FastAPI(
 app.include_router(health.router)
 
 # Cada milestone expone lo que construye (ver el diagrama de arquitectura de M0):
+
 # TODO (M1): router de signals (pink-noise y sine-sweep)
 app.include_router(signals.router, prefix="/api/v1/signals", tags=["signals"])
+
 # TODO (M2): endpoint de synthetic-ir (en el mismo router de signals) y router de filters
 app.include_router(filters.router, prefix="/api/v1/filters", tags=["filters"])
+
 # TODO (M3): routers de acoustics y utils
 # app.include_router(acoustics.router, prefix="/api/v1/acoustics", tags=["acoustics"])
 # app.include_router(utils.router, prefix="/api/v1/utils", tags=["utils"])
