@@ -102,9 +102,9 @@ def process_synthetic_deconvolution():
 
     if delay > 0:
         ir1 = synth_ir[delay:]
-        ir2 = recovered_ir[:len(ir1)]
+        ir2 = recovered_ir[: len(ir1)]
     elif delay < 0:
-        ir1 = synth_ir[:len(recovered_ir) + delay]
+        ir1 = synth_ir[: len(recovered_ir) + delay]
         ir2 = recovered_ir[-delay:]
     else:
         ir1 = synth_ir

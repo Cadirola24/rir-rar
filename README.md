@@ -22,11 +22,11 @@ desde la limpieza y filtrado de la señal de excitación, hasta la obtención de
 
 ## Integrantes
 
-| Nombre | Legajo | Rol |
-|--------|--------|-----|
-|Cadirola Valentino|80692|Dev|
-|Collado Horlent Vicente|80478|Reviewer / QA|
-|Pascuccelli Tadeo|72794|Integrador|
+| Nombre | Legajo | Rol | Rol por área del TP |
+|--------|--------|-----|---------------------|
+|Cadirola Valentino|80692|Dev|Servicios, Routers y Schemas para M1, implementación principal de M2, generación de documentación para M1 y M2, Servicios y Routers para M3
+|Collado Horlent Vicente|80478|Reviewer / QA|Servicios M1, corrección de fallas en milestones previos, Review y Merge de Pull Request, Servicios y documentación para M3
+|Pascuccelli Tadeo|72794|Integrador| Servicios M1, Servicios y Schemas para M3, Review y corrección de bugs para M3 
 ## Requisitos previos
 
 - Python 3.12 o superior
@@ -136,9 +136,12 @@ rir-rar/
 │   ├── routers/
 │   │   ├── __init__.py
 │   │   ├── health.py              # GET /health (M0)
-│   │   └── audio_http.py          # wav_response y uploaded_file (ya resueltas)
+│   │   ├── audio_http.py          # wav_response y uploaded_file (ya resueltas)
+│   │   ├── signals.py             # PinkNoiseRequest, SineSweepRequest y SyntheticIRRequest
+│   │   └── filters.py             # single_band
 │   ├── schemas/
-│   │   └── __init__.py            # Modelos Pydantic de request/response (desde M1)
+│   │   ├── __init__.py            # Modelos Pydantic de request/response (desde M1)
+│   │   └── signals.py             # PinkNoiseRequest, SineSweepRequest y SyntheticIRRequest
 │   └── services/
 │       ├── __init__.py
 │       ├── pink_noise.py          # generate_pink_noise (M1)
