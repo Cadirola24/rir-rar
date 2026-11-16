@@ -99,3 +99,23 @@
   * **Consistencia de firmas y reutilización interna:** Se respetó la firma `apply_lundeby(ir, fs) -> tuple[int, float]` de la especificación (a diferencia de la API de referencia que recibe `max_tries` y devuelve segundos) y se reutilizó la función `linear_regression(x, y)` del Servicio 3 respetando el orden matemático de sus argumentos.
   * **Estructura de esquemas y manejo de errores HTTP:** Se creó `app/schemas/utils.py` (inexistente hasta M2) y se protegieron las llamadas a `load_audio` y `apply_lundeby` en `app/routers/utils.py` capturando `ValueError` con encadenamiento `from e` para retornar `422 Unprocessable Entity` sin infringir las reglas de `ruff`.
   * **Cobertura de tests:** Se añadieron casos de prueba para respuestas exitosas (`200`) y archivos inválidos (`422`) con el objetivo de sostener la cobertura superior al $80\%$ exigida en `routers/utils.py` y `acoustic_parameters.py`.
+### Implementación de Servicios de Análisis Acústico: Suavizado, Schroeder y Regresión Lineal (`app/services/acoustic_parameters.py`)
+* **Fecha:** 2026-11-15
+* **Herramienta:** Gemini
+* **Problema:** Implementar los tres primeros servicios de procesamiento de respuesta al impulso (RI) de M3 (`apply_smoothing`, `apply_schroeder_integral` y `linear_regression`), respetando la distinción entre escalas de amplitud y energía ($20\log_{10}$ vs. $10\log_{10}$), la estabilidad numérica y el orden de argumentos definido en la especificación.
+* **Prompt:** Solicitud de guía e implementación en Python de las funciones `apply_smoothing` (envolvente de Hilbert y media móvil RMS), `apply_schroeder_integral` (curva de decaimiento energético en dB) y `linear_regression` (mínimos cuadrados ordinarios con $R^2$) a partir de las consignas del TP.
+* **Fragmento de código generado:**
+  * `apply_smoothing`: Validación de parámetros (`method` y `window_ms > 0`), cálculo de envolvente analítica mediante `np.abs(scipy.signal.hilbert(x))` y cálculo de envolvente RMS mediante convolución causal recortada (`np.convolve(x ** 2, kernel, mode="full")[:len(x)]`) seguida de raíz cuadrada.
+  * `apply_schroeder_integral`: Integración inversa de energía con `np.cumsum((h ** 2)[::-1])[::-1]`, normalización en dB mediante $10 \log_{10}((E[n] + \text{eps}) / (E[0] + \text{eps}))$ y recorte de piso a `-150.0 dB` para evitar valores `-inf` o `NaN` en la serialización JSON.
+  * `linear_regression`: Cálculo cerrado de pendiente ($m$), ordenada al origen ($b$) y coeficiente de determinación ($R^2$) mediante sumas centradas en la media, respetando la firma `(x, y)` en orden matemático sin depender de `np.polyfit`.
+* **Modificaciones:** Se utilizó convolución causal con recorte a `len(x)` en lugar de `mode="same"` para preservar exactamente la longitud de la señal de entrada ante cualquier tamaño de ventana, verificando los tres servicios mediante los tests unitarios en `tests/test_analisis.py` (`XPASS`).
+
+### Integración de Endpoints HTTP, Schemas Pydantic y Correcciones de Linting/CI (`app/routers/` y `app/schemas/`)
+* **Fecha:** 2026-11-15
+* **Herramienta:** Gemini
+* **Problema:** Completar la lógica de los endpoints `POST /api/v1/utils/smoothing` y `POST /api/v1/utils/schroeder`, integrar los schemas de respuesta y resolver los errores de estilo y formato reportados por `ruff` en el workflow de GitHub Actions (`CI / lint-and-test`).
+* **Prompt:** Solicitud de implementación del cuerpo de los endpoints en `app/routers/utils.py`, verificación con `pytest` y resolución de reglas de `ruff check` y `ruff format --check` previo al merge a `main`.
+* **Fragmento de código generado:** Implementación de carga de audio mediante `load_audio` con captura de `ValueError` hacia `HTTPException(status_code=422)`, decimación uniforme de las curvas (`env[::step]` y `edc[::step]`) con cálculo de paso temporal `time_step = step / fs`, y retorno estructurado mediante `SmoothingResponse` y `SchroederResponse`.
+* **Modificaciones:**
+  * Se actualizó `SmoothingMethod` heredando de `enum.StrEnum` (regla `UP042`) y se agregó el import faltante de `datetime` en `app/schemas/responses.py`.
+  * Se refactorizaron los parámetros `File(...)` y `Form(...)` en `app/routers/utils.py` y `app/routers/acoustics.py` usando `typing.Annotated` (regla `B008`), se encadenaron excepciones con `raise ... from e` (regla `B904`), se ajustaron comentarios que superaban los 100 caracteres (`E501`) y se ejecutó `ruff format` para dejar el pipeline en verde.
