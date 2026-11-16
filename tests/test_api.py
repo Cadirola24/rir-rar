@@ -129,6 +129,19 @@ def test_signals_synthetic_ir_endpoint():
     assert len(senal) == 44100
 
 
+def test_synthetic_ir_band_above_nyquist_returns_422():
+    """Si se pide una banda por encima de fs/2, devuelve 422 Unprocessable Entity."""
+    response = client.post(
+        "/api/v1/signals/synthetic-ir",
+        json={
+            "duration": 1.0,
+            "t60_values": {"16000": 1.0},
+            "sample_rate": 44100,
+        },
+    )
+    assert response.status_code == 422
+
+
 def test_filters_single_band_endpoint():
     """/api/v1/filters/single-band recibe un WAV y devuelve la banda filtrada."""
     fs = 44100
