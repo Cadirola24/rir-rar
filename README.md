@@ -126,6 +126,7 @@ curl -X 'POST' \
 ```
 
 ### M3: Producto Final
+ri_corta.wav y ri_larga.wav son intercambiables, cualquier endpoint de M3 puede probarse con las dos
 
 #### Suavizado de señal
 
@@ -164,7 +165,7 @@ curl -X 'POST' \
 
 ```bash
   curl -X POST "http://localhost:8000/api/v1/acoustics/parameters" \
-  -F "file=@respuesta_impulso.wav"
+  -F "file=@ri_corta.wav"
 ```
 
 ## Estructura del proyecto
