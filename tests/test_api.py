@@ -168,7 +168,6 @@ def test_invalid_file_returns_422():
 # ── M3 ───────────────────────────────────────────────────────────────────────
 
 
-@xfail_m3
 def test_acoustics_parameters_endpoint():
     """Enviar una RI a /api/v1/acoustics/parameters devuelve los parametros por banda."""
     fs = 44100
@@ -178,7 +177,6 @@ def test_acoustics_parameters_endpoint():
     assert isinstance(response.json(), dict)
 
 
-@xfail_m3
 def test_utils_schroeder_endpoint():
     """/api/v1/utils/schroeder devuelve la curva de caida (en dB, decreciente)."""
     fs = 44100
@@ -188,7 +186,6 @@ def test_utils_schroeder_endpoint():
     assert isinstance(response.json(), dict)
 
 
-@xfail_m3
 def test_utils_smoothing_endpoint():
     """/api/v1/utils/smoothing devuelve la envolvente de la senal."""
     fs = 44100
@@ -196,3 +193,32 @@ def test_utils_smoothing_endpoint():
     response = client.post("/api/v1/utils/smoothing", files=archivos)
     assert response.status_code == 200
     assert isinstance(response.json(), dict)
+
+
+def test_utils_lundeby_endpoint():
+    fs = 16000
+    t = np.arange(fs) / fs
+    rng = np.random.default_rng(42)
+    ir = np.exp(-6.9078 * t) * rng.standard_normal(fs) + 1e-4 * rng.standard_normal(fs)
+
+    buf = io.BytesIO()
+    sf.write(buf, ir, fs, format="WAV")
+    buf.seek(0)
+
+    response = client.post(
+        "/api/v1/utils/lundeby",
+        files={"file": ("ir_test.wav", buf, "audio/wav")},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert 0 <= data["cutoff_index"] < fs
+    assert 0.0 <= data["cutoff_time"] < 1.0
+    assert data["noise_level_db"] < 0.0
+
+
+def test_utils_lundeby_invalid_file_returns_422():
+    response = client.post(
+        "/api/v1/utils/lundeby",
+        files={"file": ("not_audio.txt", b"contenido invalido", "text/plain")},
+    )
+    assert response.status_code == 422

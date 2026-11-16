@@ -132,15 +132,19 @@ def _sounddevice_falso(hay_dispositivo: bool = True) -> types.ModuleType:
             raise PortAudioError("No hay dispositivo de audio")
         return {"name": "falso", "max_input_channels": 2, "max_output_channels": 2}
 
-    sd.PortAudioError = PortAudioError
-    sd.playrec = playrec
-    sd.rec = rec
-    sd.play = lambda *args, **kwargs: None
-    sd.wait = lambda *args, **kwargs: None
-    sd.query_devices = query_devices
-    sd.check_input_settings = lambda *args, **kwargs: query_devices()
-    sd.check_output_settings = lambda *args, **kwargs: query_devices()
-    sd.default = types.SimpleNamespace(device=(0, 0), samplerate=None, channels=None)
+    sd.__dict__.update(
+        {
+            "PortAudioError": PortAudioError,
+            "playrec": playrec,
+            "rec": rec,
+            "play": lambda *args, **kwargs: None,
+            "wait": lambda *args, **kwargs: None,
+            "query_devices": query_devices,
+            "check_input_settings": lambda *args, **kwargs: query_devices(),
+            "check_output_settings": lambda *args, **kwargs: query_devices(),
+            "default": types.SimpleNamespace(device=(0, 0), samplerate=None, channels=None),
+        }
+    )
     return sd
 
 

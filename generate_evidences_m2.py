@@ -18,7 +18,7 @@ DOCS_DIR = Path("docs/m2")
 DOCS_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def plot_spectrum(signal: np.ndarray, fs: int, label: str, color: str = None):
+def plot_spectrum(signal: np.ndarray, fs: int, label: str, color: str | None = None):
     """Calcula y grafica el espectro de magnitud en dB."""
     n = len(signal)
     fft_vals = np.fft.rfft(signal)
@@ -85,7 +85,18 @@ def process_synthetic_deconvolution():
     t60_values = {500: 1.2, 1000: 1.0, 2000: 0.8}
 
     # 1. Generar RI Sintética
-    synth_ir = generate_synthetic_ir(duration=duration, t60_values=t60_values, fs=fs)
+    synth_ir = generate_synthetic_ir(
+        duration=duration,
+        t60_values={
+            125.0: 1.5,
+            250.0: 1.4,
+            500.0: 1.3,
+            1000.0: 1.2,
+            2000.0: 1.0,
+            4000.0: 0.8,
+        },
+        fs=fs,
+    )
 
     # 2. Generar Sweep e Inverse Filter
     sweep, inv_filter = generate_sine_sweep_pair(duration=5.0, f1=20.0, f2=20000.0, fs=fs)
