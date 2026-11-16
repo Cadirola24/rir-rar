@@ -120,6 +120,14 @@ curl -X GET \
   "http://localhost:8000/api/v1/filters/frequencies?sample_rate=44100"
 ```
 
+#### Filtrado multibanda
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/filters/band" \
+  -F "file=@thx-sound-test.wav" \
+  -F "order=4"
+```
+
 #### Filtrado por Banda
 Sube un archivo de audio WAV y devuelve la señal filtrada en la banda especificada.
 
@@ -128,7 +136,7 @@ curl -X 'POST' \
   'http://localhost:8000/api/v1/filters/single-band' \
   -H 'accept: audio/wav' \
   -H 'Content-Type: multipart/form-data' \
-  -F 'file=@tests/data/thx-sound-test.wav' \
+  -F 'file=@thx-sound-test.wav' \
   -F 'center_freq=1000' \
   --output ir_filtrada.wav
 ```

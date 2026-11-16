@@ -144,3 +144,23 @@
 * **Modificaciones:**
   * **Cumplimiento de reglas de linter (`ruff`):** Se dividió el string de `description` dentro de `Query(...)` mediante concatenación implícita entre paréntesis para respetar el límite máximo de longitud de línea (`E501`) configurado en el proyecto.
   * **Validación automática de parámetros y documentación:** Se aprovechó `Query(..., gt=0)` para delegar en FastAPI/Pydantic el rechazo con `422 Unprocessable Entity` ante frecuencias de muestreo nulas o negativas, dejando el endpoint expuesto automáticamente en Swagger (`/docs`) y ReDoc (`/redoc`).
+
+### Implementación del Endpoint Opcional `POST /utils/log-scale` (`app/services/acoustic_parameters.py`, `app/schemas/utils.py`, `app/routers/utils.py`)
+* **Fecha:** 2026-11-16
+* **Herramienta:** Gemini
+* **Descripción del problema:** Se necesitaba implementar el endpoint `POST /api/v1/utils/log-scale` para convertir la amplitud de una señal de audio a escala logarítmica normalizada en decibeles ($20 \log_{10}(|x| / \max(|x|))$), permitiendo visualizar envolventes y respuestas al impulso en dB con un piso configurable para evitar $\log(0)$.
+* **Prompt:** Solicitud para implementar la función de servicio `apply_log_scale`, su schema Pydantic de salida (`LogScaleResponse`), la ruta `POST /log-scale` en `app/routers/utils.py` con manejo de errores HTTP y el comando `curl` de ejemplo.
+* **Fragmento de código generado:** Se implementó `apply_log_scale(signal, floor_db=-120.0)` en `app/services/acoustic_parameters.py` normalizando respecto al pico absoluto y recortando valores inferiores a `floor_db`. En `app/schemas/utils.py` se definió el modelo `LogScaleResponse` (`sample_rate`, `floor_db`, `time_step`, `signal_db`) y en `app/routers/utils.py` se expuso `@router.post("/log-scale", response_model=LogScaleResponse)` con validación de formulario mediante `Annotated[..., Form(lt=0, ge=-200)]` y decimación uniforme de la señal.
+* **Modificaciones:**
+  * **Normalización multicanal y protección contra señales nulas:** Se incorporó la conversión automática a mono (`mean(axis=1)`) para audios estéreo y la validación de amplitud máxima (`peak <= 0.0`), lanzando un `ValueError` capturado en el router para devolver `422 Unprocessable Entity` en lugar de generar valores `NaN` o `-inf` incompatibles con JSON.
+  * **Consistencia de decimación y cumplimiento de linter (`ruff`):** Se aplicó el mismo criterio de submuestreo (`step = max(1, len(signal_db) // 1000)`) utilizado en `/utils/smoothing` y `/utils/schroeder`, manteniendo los docstrings, anotaciones de tipo y longitudes de línea dentro de las reglas de estilo del proyecto.
+
+### Implementación del Endpoint Opcional `POST /filters/band` (`app/services/filter.py`, `app/schemas/filters.py`, `app/routers/filters.py`)
+* **Fecha:** 2026-11-16
+* **Herramienta:** Gemini
+* **Descripción del problema:** Se necesitaba implementar el endpoint `POST /api/v1/filters/band` para descomponer y filtrar una señal de audio en todas las bandas de octava estándar (125 Hz a 4000 Hz) en una sola petición, omitiendo de manera segura aquellas bandas cuya frecuencia de corte superior supere el límite de Nyquist.
+* **Prompt:** Solicitud para implementar el servicio de filtrado multibanda (`filter_all_octave_bands`), su modelo Pydantic de respuesta (`MultiBandFilterResponse`), la ruta `POST /band` en `app/routers/filters.py` con decimación de salida y el comando `curl` de prueba.
+* **Fragmento de código generado:** Se definió `filter_all_octave_bands(signal, fs, order=4)` en `app/services/filter.py` reutilizando `filter_single_band` sobre la constante `STANDARD_OCTAVE_BANDS` con verificación preventiva de Nyquist ($f_c \cdot \sqrt{2} < f_s / 2$). En `app/schemas/filters.py` se creó `MultiBandFilterResponse` (`sample_rate`, `order`, `center_frequencies`, `time_step`, `bands`) y en `app/routers/filters.py` se agregó `@router.post("/band", response_model=MultiBandFilterResponse)` submuestreando cada banda a un máximo aproximado de 1000 puntos.
+* **Modificaciones:**
+  * **Normalización de entrada y manejo de Nyquist:** Se agregó la conversión automática a mono (`mean(axis=1)`) y validación de señal vacía o `fs <= 0` al inicio de `filter_all_octave_bands` para capturar `ValueError` y retornar `422 Unprocessable Entity`, mientras que las bandas por encima de Nyquist se omiten limpiamente sin producir errores `500`.
+  * **Organización PEP 8 y cumplimiento de linter (`ruff`):** Se ubicó la constante `STANDARD_OCTAVE_BANDS` a nivel de módulo debajo de los `import`, se utilizaron anotaciones `Annotated[..., File(...)]` y `Annotated[..., Form(...)]` (regla `B008`) y se encadenaron excepciones con `raise ... from e` (regla `B904`).

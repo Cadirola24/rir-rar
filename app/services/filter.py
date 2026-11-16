@@ -6,6 +6,33 @@ Milestone 2: Procesamiento de la respuesta al impulso.
 import numpy as np
 from scipy.signal import butter, sosfiltfilt
 
+STANDARD_OCTAVE_BANDS: tuple[float, ...] = (125.0, 250.0, 500.0, 1000.0, 2000.0, 4000.0)
+
+
+def filter_all_octave_bands(
+    signal: np.ndarray,
+    fs: int,
+    order: int = 4,
+) -> dict[float, np.ndarray]:
+    """Filtra una señal en todas las bandas de octava estándar debajo de Nyquist."""
+    x = np.asarray(signal, dtype=float)
+    if x.ndim > 1:
+        x = x.mean(axis=1)
+    if x.size == 0:
+        raise ValueError("La señal no puede estar vacía.")
+    if fs <= 0:
+        raise ValueError("La frecuencia de muestreo debe ser positiva.")
+
+    nyquist = fs / 2.0
+    filtered_bands: dict[float, np.ndarray] = {}
+
+    for center_freq in STANDARD_OCTAVE_BANDS:
+        if center_freq * np.sqrt(2.0) >= nyquist:
+            continue
+        filtered_bands[center_freq] = filter_single_band(x, fs, center_freq, order)
+
+    return filtered_bands
+
 
 def filter_single_band(
     signal: np.ndarray, fs: int, center_freq: float, order: int = 4

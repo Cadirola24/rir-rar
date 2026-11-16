@@ -30,3 +30,17 @@ class FrequenciesResponse(BaseModel):
         ...,
         description="Frecuencias centrales estándar de bandas de tercio de octava en Hz.",
     )
+
+
+class MultiBandFilterResponse(BaseModel):
+    sample_rate: int = Field(..., gt=0, description="Frecuencia de muestreo en Hz.")
+    order: int = Field(..., ge=1, le=8, description="Orden del filtro Butterworth.")
+    center_frequencies: list[float] = Field(
+        ...,
+        description="Frecuencias centrales de octava filtradas por debajo de Nyquist (Hz).",
+    )
+    time_step: float = Field(..., gt=0, description="Paso temporal entre muestras diezmadas (s).")
+    bands: dict[float, list[float]] = Field(
+        ...,
+        description="Señal filtrada y diezmada por cada frecuencia central de octava.",
+    )

@@ -1,9 +1,11 @@
+from typing import Annotated
+
 import numpy as np
 from fastapi import APIRouter, File, Form, HTTPException, Query, UploadFile
 
 from app.routers.audio_http import uploaded_file, wav_response
-from app.schemas.responses import FrequenciesResponse
-from app.services.filter import filter_single_band
+from app.schemas.responses import FrequenciesResponse, MultiBandFilterResponse
+from app.services.filter import filter_all_octave_bands, filter_single_band
 from app.services.signal_utils import load_audio
 
 router = APIRouter()
@@ -62,8 +64,7 @@ async def get_frequencies(
         default=None,
         gt=0,
         description=(
-            "Frecuencia de muestreo opcional (Hz) para filtrar bandas por debajo "
-            "de Nyquist."
+            "Frecuencia de muestreo opcional (Hz) para filtrar bandas por debajo de Nyquist."
         ),
     ),
 ):
@@ -83,6 +84,36 @@ async def get_frequencies(
         sample_rate=sample_rate,
         octave_bands=valid_octave,
         third_octave_bands=valid_third,
+    )
+
+
+@router.post("/band", response_model=MultiBandFilterResponse)
+async def all_bands(
+    file: Annotated[UploadFile, File(...)],
+    order: Annotated[int, Form(ge=1, le=8)] = 4,
+):
+    """Filtra el archivo de audio en todas las bandas de octava válidas."""
+    with uploaded_file(file) as path:
+        try:
+            signal, fs = load_audio(path)
+        except ValueError as e:
+            raise HTTPException(status_code=422, detail=f"No es un audio válido: {e}") from e
+
+    try:
+        bands_full = filter_all_octave_bands(signal, fs, order=order)
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e)) from e
+
+    num_samples = signal.shape[0]
+    step = max(1, num_samples // 1000)
+    bands_decimated = {fc: arr[::step].tolist() for fc, arr in bands_full.items()}
+
+    return MultiBandFilterResponse(
+        sample_rate=fs,
+        order=order,
+        center_frequencies=sorted(bands_decimated.keys()),
+        time_step=step / fs,
+        bands=bands_decimated,
     )
 
 
