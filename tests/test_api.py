@@ -270,3 +270,21 @@ def test_filters_all_bands_endpoint():
         files={"file": ("not_audio.txt", b"contenido invalido", "text/plain")},
     )
     assert res_bad.status_code == 422
+
+
+def test_analysis_impulse_response_endpoint():
+    """/api/v1/analysis/impulse-response devuelve Lundeby, Schroeder y parametros ISO."""
+    fs = 44100
+    archivos = {"file": ("ir.wav", _wav_en_memoria(_ri_sintetica(fs), fs), "audio/wav")}
+    res_ok = client.post("/api/v1/analysis/impulse-response", files=archivos)
+    assert res_ok.status_code == 200
+    body = res_ok.json()
+    assert "lundeby" in body
+    assert "schroeder" in body
+    assert "acoustic_parameters" in body
+
+    res_bad = client.post(
+        "/api/v1/analysis/impulse-response",
+        files={"file": ("not_audio.txt", b"contenido invalido", "text/plain")},
+    )
+    assert res_bad.status_code == 422

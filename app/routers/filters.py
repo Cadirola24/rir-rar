@@ -58,6 +58,7 @@ THIRD_OCTAVE_BANDS: tuple[float, ...] = (
 )
 
 
+# POST /api/v1/filters/frequencies
 @router.get("/frequencies", response_model=FrequenciesResponse)
 async def get_frequencies(
     sample_rate: int | None = Query(
@@ -87,6 +88,7 @@ async def get_frequencies(
     )
 
 
+# POST /api/v1/filters/band
 @router.post("/band", response_model=MultiBandFilterResponse)
 async def all_bands(
     file: Annotated[UploadFile, File(...)],
@@ -117,7 +119,8 @@ async def all_bands(
     )
 
 
-@router.post("/single-band")  # POST /api/v1/filters/single-band
+# POST /api/v1/filters/single-band
+@router.post("/single-band")
 async def single_band(
     file: UploadFile = File(...),  # noqa: B008
     center_freq: float = Form(..., gt=0),
