@@ -112,6 +112,14 @@ curl -X 'POST' \
 }' --output ri_sintetica.wav
 ```
 
+#### Frecuencias centrales de octava y/o tercio de octava soportadas por el banco de filtros
+Para probarlo sin parámetros, eliminar `?sample_rate=44100`
+
+```bash
+curl -X GET \
+  "http://localhost:8000/api/v1/filters/frequencies?sample_rate=44100"
+```
+
 #### Filtrado por Banda
 Sube un archivo de audio WAV y devuelve la señal filtrada en la banda especificada.
 
