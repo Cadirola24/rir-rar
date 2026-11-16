@@ -6,6 +6,7 @@ Milestone 3: Producto final.
 import numpy as np
 from scipy import signal as sp_signal
 
+
 def apply_smoothing(
     signal: np.ndarray, fs: int, method: str = "hilbert", window_ms: float = 10
 ) -> np.ndarray:
