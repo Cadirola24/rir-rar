@@ -196,3 +196,33 @@ def test_utils_smoothing_endpoint():
     response = client.post("/api/v1/utils/smoothing", files=archivos)
     assert response.status_code == 200
     assert isinstance(response.json(), dict)
+
+
+def test_utils_lundeby_endpoint():
+    fs = 16000
+    t = np.arange(fs) / fs
+    rng = np.random.default_rng(42)
+    ir = np.exp(-6.9078 * t) * rng.standard_normal(fs) + 1e-4 * rng.standard_normal(fs)
+
+    buf = io.BytesIO()
+    sf.write(buf, ir, fs, format="WAV")
+    buf.seek(0)
+
+    response = client.post(
+        "/api/v1/utils/lundeby",
+        files={"file": ("ir_test.wav", buf, "audio/wav")},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["sample_rate"] == fs
+    assert data["num_samples"] == fs
+    assert 0 <= data["index"] < fs
+    assert data["noise_level_db"] < 0.0
+
+
+def test_utils_lundeby_invalid_file_returns_422():
+    response = client.post(
+        "/api/v1/utils/lundeby",
+        files={"file": ("not_audio.txt", b"contenido invalido", "text/plain")},
+    )
+    assert response.status_code == 422

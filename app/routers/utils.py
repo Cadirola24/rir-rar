@@ -9,7 +9,11 @@ from app.schemas.utils import (
     SmoothingMethod,
     SmoothingResponse,
 )
-from app.services.acoustic_parameters import apply_schroeder_integral, apply_smoothing
+from app.services.acoustic_parameters import (
+    apply_lundeby,
+    apply_schroeder_integral,
+    apply_smoothing,
+)
 from app.services.signal_utils import load_audio
 
 router = APIRouter()
@@ -64,4 +68,22 @@ async def schroeder(file: Annotated[UploadFile, File(...)]):
 
 
 @router.post("/lundeby", response_model=LundebyResponse)
-async def lundeby(file: UploadFile) -> LundebyResponse: ...
+async def lundeby(file: UploadFile = File(...)) -> LundebyResponse:  # noqa: B008
+    with uploaded_file(file) as path:
+        try:
+            ir, fs = load_audio(path)
+        except ValueError as e:
+            raise HTTPException(status_code=422, detail=f"No es un audio válido: {e}") from e
+
+    try:
+        index, noise_level_db = apply_lundeby(ir, fs)
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e)) from e
+
+    return LundebyResponse(
+        sample_rate=fs,
+        num_samples=len(ir),
+        cutoff_index=index,
+        cutoff_time=round(index / fs, 6),
+        noise_level_db=noise_level_db,
+    )  # ty: ignore[pydantic-discarded-extra-argument]
