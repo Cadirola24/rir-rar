@@ -5,17 +5,12 @@ Mientras las funciones lancen ``NotImplementedError`` estos tests quedan como
 """
 
 import numpy as np
-import pytest
 
 from app.services.acoustic_parameters import (
     apply_schroeder_integral,
     apply_smoothing,
     calculate_parameters_from_ir,
     linear_regression,
-)
-
-pytestmark = pytest.mark.xfail(
-    raises=NotImplementedError, strict=False, reason="se implementa en M3"
 )
 
 
@@ -134,6 +129,7 @@ class TestCalculateParametersFromIR:
         for clave in ("EDT", "T20", "T30", "D50", "C80"):
             assert clave in params
         t30 = params["T30"][1000]
+        assert t30 is not None
         assert abs(t30 - t60) <= 0.1 * t60, f"T30(1 kHz) = {t30:.2f} s"
 
     def test_d50_range(self):
@@ -141,6 +137,7 @@ class TestCalculateParametersFromIR:
         fs = 44100
         params = calculate_parameters_from_ir(_exponential_ir(1.0, fs, 2.0), fs)
         for valor in params["D50"].values():
+            assert valor is not None
             assert 0.0 <= valor <= 100.0
 
     def test_c80_consistency(self):
@@ -148,4 +145,5 @@ class TestCalculateParametersFromIR:
         fs = 44100
         params = calculate_parameters_from_ir(_exponential_ir(0.3, fs, 1.0), fs)
         for valor in params["C80"].values():
+            assert valor is not None
             assert valor > 0
