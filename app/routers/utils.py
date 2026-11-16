@@ -67,6 +67,7 @@ async def schroeder(file: Annotated[UploadFile, File(...)]):
     )
 
 
+# POST /api/v1/utils/lundeby
 @router.post("/lundeby", response_model=LundebyResponse)
 async def lundeby(file: UploadFile = File(...)) -> LundebyResponse:  # noqa: B008
     with uploaded_file(file) as path:
@@ -81,9 +82,7 @@ async def lundeby(file: UploadFile = File(...)) -> LundebyResponse:  # noqa: B00
         raise HTTPException(status_code=422, detail=str(e)) from e
 
     return LundebyResponse(
-        sample_rate=fs,
-        num_samples=len(ir),
         cutoff_index=index,
         cutoff_time=round(index / fs, 6),
         noise_level_db=noise_level_db,
-    )  # ty: ignore[pydantic-discarded-extra-argument]
+    )

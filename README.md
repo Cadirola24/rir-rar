@@ -62,7 +62,7 @@ Servidor corriendo con `uv run uvicorn app.main:app --reload` antes de ejecutar 
 
 ### M1: Generación de Señales
 
-#### 1. Generar Ruido Rosa
+#### Generar Ruido Rosa
 Genera una señal de ruido rosa (Voss-McCartney) y la guarda como `ruido_rosa.wav`.
 
 ```bash
@@ -76,7 +76,7 @@ curl -X 'POST' \
 }' --output ruido_rosa.wav
 ```
 
-#### 1. Generar Sine Sweep
+#### Generar Sine Sweep
 Genera un Sine Sweep logarítmico. Si el parámetro `inverse` es `true`, devuelve el filtro inverso
 
 ```bash
@@ -95,7 +95,7 @@ curl -X 'POST' \
 
 ### M2: Procesamiento de la RI
 
-#### 1. Generar Respuesta al Impulso (RI) Sintética
+#### Generar Respuesta al Impulso (RI) Sintética
 Genera una RI sintética parametrizada por sus valores de decaimiento T60.
 
 ```bash
@@ -112,7 +112,7 @@ curl -X 'POST' \
 }' --output ri_sintetica.wav
 ```
 
-#### 2. Filtrado por Banda
+#### Filtrado por Banda
 Sube un archivo de audio WAV y devuelve la señal filtrada en la banda especificada.
 
 ```bash
@@ -123,6 +123,48 @@ curl -X 'POST' \
   -F 'file=@tests/data/thx-sound-test.wav' \
   -F 'center_freq=1000' \
   --output ir_filtrada.wav
+```
+
+### M3: Producto Final
+
+#### Suavizado de señal
+
+**Con transformada de Hilbert** (no requiere ventana temporal):
+
+```bash
+  curl -X POST "http://localhost:8000/api/v1/utils/smoothing" \
+    -F "file=@ri_corta.wav" \
+    -F "method=hilbert"
+```
+
+**Con media móvil** (permite especificar el ancho de ventana en milisegundos mediante window_ms):
+
+```bash
+  curl -X POST "http://localhost:8000/api/v1/utils/smoothing" \
+  -F "file=@ri_corta.wav" \
+  -F "method=moving_average" \
+  -F "window_ms=10"
+```
+
+#### Integral de Schroeder
+
+```bash
+  curl -X POST "http://localhost:8000/api/v1/utils/schroeder" \
+  -F "file=@ri_larga.wav"
+```
+
+#### Truncamiento de Lundeby
+
+```bash
+  curl -X POST "http://localhost:8000/api/v1/utils/lundeby" \
+  -F "file=@ri_larga.wav"
+```
+
+#### Parámetros acústicos
+
+```bash
+  curl -X POST "http://localhost:8000/api/v1/acoustics/parameters" \
+  -F "file=@respuesta_impulso.wav"
 ```
 
 ## Estructura del proyecto
@@ -138,10 +180,14 @@ rir-rar/
 │   │   ├── health.py              # GET /health (M0)
 │   │   ├── audio_http.py          # wav_response y uploaded_file (ya resueltas)
 │   │   ├── signals.py             # POST /api/v1/signals/pink-noise, POST /api/v1/signals/sine-sweep y POST /api/v1/signals/synthetic-ir
-│   │   └── filters.py             # POST /api/v1/filters/single-band
+│   │   ├── filters.py             # POST /api/v1/filters/single-band
+│   │   ├── acoustics.py           # POST /api/v1/acoustics/parameters
+│   │   └── utils.py               # POST /api/v1/utils/smoothing, POST /api/v1/utils/schroeder y POST /api/v1/utils/lundeby
 │   ├── schemas/
 │   │   ├── __init__.py            # Modelos Pydantic de request/response (desde M1)
-│   │   └── signals.py             # PinkNoiseRequest, SineSweepRequest y SyntheticIRRequest
+│   │   ├── signals.py             # PinkNoiseRequest, SineSweepRequest y SyntheticIRRequest
+│   │   ├── responses.py           # HealthResponse y BandAnalysisResponse
+│   │   └── utils.py               # SmoothingMethod, SmoothingResponse, SchroederResponse y LundebyResponse
 │   └── services/
 │       ├── __init__.py
 │       ├── pink_noise.py          # generate_pink_noise (M1)
@@ -165,14 +211,16 @@ rir-rar/
 │   ├── arquitectura.drawio        # Diagrama de la arquitectura de la api
 │   ├── diagrama_arquitectura.png  # Diagrama en formato .png
 │   ├── m1/                        # Documentación de funcionamiento de M1
-│   └── m2/                        # Documentación de funcionamiento de M2
+│   ├── m2/                        # Documentación de funcionamiento de M2
+│   └── m3/                        # Documentación de funcionamiento de M3
 ├── .github/workflows/ci.yml       # CI: ruff + pytest en cada push/PR
 ├── .gitignore
 ├── pyproject.toml                 # Dependencias y configuracion (ruff, pytest)
 ├── README.md
 ├── AI_LOG.md                      # Documentación de uso de IA
-├── generate_evidences.py          # Generación de documentación para M1
-└── generate_evidences_m2.py       # Generación de documentación para M2
+├── generate_evidences_m1.py          # Generación de documentación para M1
+├── generate_evidences_m2.py       # Generación de documentación para M2
+└── generate_evidences_m3.py       # Generación de documentación para M2
 ```
 
 Cada milestone expone lo que construye: los routers y schemas de `signals` se agregan en M1
