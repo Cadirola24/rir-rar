@@ -145,16 +145,6 @@
   * **Cumplimiento de reglas de linter (`ruff`):** Se dividió el string de `description` dentro de `Query(...)` mediante concatenación implícita entre paréntesis para respetar el límite máximo de longitud de línea (`E501`) configurado en el proyecto.
   * **Validación automática de parámetros y documentación:** Se aprovechó `Query(..., gt=0)` para delegar en FastAPI/Pydantic el rechazo con `422 Unprocessable Entity` ante frecuencias de muestreo nulas o negativas, dejando el endpoint expuesto automáticamente en Swagger (`/docs`) y ReDoc (`/redoc`).
 
-### Implementación del Endpoint Opcional `POST /utils/log-scale` (`app/services/acoustic_parameters.py`, `app/schemas/utils.py`, `app/routers/utils.py`)
-* **Fecha:** 2026-11-16
-* **Herramienta:** Gemini
-* **Descripción del problema:** Se necesitaba implementar el endpoint `POST /api/v1/utils/log-scale` para convertir la amplitud de una señal de audio a escala logarítmica normalizada en decibeles ($20 \log_{10}(|x| / \max(|x|))$), permitiendo visualizar envolventes y respuestas al impulso en dB con un piso configurable para evitar $\log(0)$.
-* **Prompt:** Solicitud para implementar la función de servicio `apply_log_scale`, su schema Pydantic de salida (`LogScaleResponse`), la ruta `POST /log-scale` en `app/routers/utils.py` con manejo de errores HTTP y el comando `curl` de ejemplo.
-* **Fragmento de código generado:** Se implementó `apply_log_scale(signal, floor_db=-120.0)` en `app/services/acoustic_parameters.py` normalizando respecto al pico absoluto y recortando valores inferiores a `floor_db`. En `app/schemas/utils.py` se definió el modelo `LogScaleResponse` (`sample_rate`, `floor_db`, `time_step`, `signal_db`) y en `app/routers/utils.py` se expuso `@router.post("/log-scale", response_model=LogScaleResponse)` con validación de formulario mediante `Annotated[..., Form(lt=0, ge=-200)]` y decimación uniforme de la señal.
-* **Modificaciones:**
-  * **Normalización multicanal y protección contra señales nulas:** Se incorporó la conversión automática a mono (`mean(axis=1)`) para audios estéreo y la validación de amplitud máxima (`peak <= 0.0`), lanzando un `ValueError` capturado en el router para devolver `422 Unprocessable Entity` en lugar de generar valores `NaN` o `-inf` incompatibles con JSON.
-  * **Consistencia de decimación y cumplimiento de linter (`ruff`):** Se aplicó el mismo criterio de submuestreo (`step = max(1, len(signal_db) // 1000)`) utilizado en `/utils/smoothing` y `/utils/schroeder`, manteniendo los docstrings, anotaciones de tipo y longitudes de línea dentro de las reglas de estilo del proyecto.
-
 ### Implementación del Endpoint Opcional `POST /filters/band` (`app/services/filter.py`, `app/schemas/filters.py`, `app/routers/filters.py`)
 * **Fecha:** 2026-11-16
 * **Herramienta:** Gemini

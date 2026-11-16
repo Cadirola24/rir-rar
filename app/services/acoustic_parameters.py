@@ -383,25 +383,3 @@ def apply_lundeby(ir: np.ndarray, fs: int) -> tuple[int, float]:
         cross_sample = new_cross_sample
 
     return int(cross_sample), float(noise_level_db)
-
-
-def apply_log_scale(signal: np.ndarray, floor_db: float = -120.0) -> np.ndarray:
-    """Convierte la amplitud de una señal a escala logarítmica normalizada en dB.
-
-    Normaliza respecto del pico absoluto: ``20 * log10(|x| / max(|x|))``,
-    recortando los valores por debajo de ``floor_db`` para evitar ``-inf``.
-    """
-    x = np.asarray(signal, dtype=float)
-    if x.ndim > 1:
-        x = x.mean(axis=1)
-    if x.size == 0:
-        raise ValueError("La señal no puede estar vacía.")
-
-    abs_x = np.abs(x)
-    peak = float(np.max(abs_x))
-    if peak <= 0.0:
-        raise ValueError("La señal tiene amplitud nula; no se puede normalizar a dB.")
-
-    eps = np.finfo(float).eps
-    log_db = 20.0 * np.log10(np.maximum(abs_x, eps) / peak)
-    return np.maximum(log_db, floor_db)

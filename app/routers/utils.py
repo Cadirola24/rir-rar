@@ -11,12 +11,11 @@ from app.schemas.utils import (
     SmoothingResponse,
 )
 from app.services.acoustic_parameters import (
-    apply_log_scale,
     apply_lundeby,
     apply_schroeder_integral,
     apply_smoothing,
 )
-from app.services.signal_utils import load_audio
+from app.services.signal_utils import load_audio, logarithmic_scale_conversion
 
 router = APIRouter()
 
@@ -102,10 +101,7 @@ async def log_scale(
         except ValueError as e:
             raise HTTPException(status_code=422, detail=f"No es un audio válido: {e}") from e
 
-    try:
-        signal_db = apply_log_scale(ir, floor_db=floor_db)
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e)) from e
+    signal_db = logarithmic_scale_conversion(ir, floor_db=floor_db)
 
     step = max(1, len(signal_db) // 1000)
     signal_decimated = signal_db[::step]
