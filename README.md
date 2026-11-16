@@ -176,6 +176,14 @@ ri_corta.wav y ri_larga.wav son intercambiables, cualquier endpoint de M3 puede 
   -F "file=@ri_corta.wav"
 ```
 
+#### Conversión a escala logarítmica normalizada
+
+```bash
+  curl -X POST "http://localhost:8000/api/v1/utils/log-scale" \
+  -F "file=@tests/data/thx-sound-test.wav" \
+  -F "floor_db=-120"
+```
+
 ## Estructura del proyecto
 
 ```
