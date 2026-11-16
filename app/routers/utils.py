@@ -26,9 +26,7 @@ async def smoothing(
         try:
             ir, fs = load_audio(path)
         except ValueError as e:
-            raise HTTPException(
-                status_code=422, detail=f"No es un audio válido: {e}"
-            ) from e
+            raise HTTPException(status_code=422, detail=f"No es un audio válido: {e}") from e
 
     env = apply_smoothing(ir, fs, method=method.value, window_ms=window_ms)
     step = max(1, len(env) // 1000)
@@ -50,9 +48,7 @@ async def schroeder(file: Annotated[UploadFile, File(...)]):
         try:
             ir, fs = load_audio(path)
         except ValueError as e:
-            raise HTTPException(
-                status_code=422, detail=f"No es un audio válido: {e}"
-            ) from e
+            raise HTTPException(status_code=422, detail=f"No es un audio válido: {e}") from e
 
     edc = apply_schroeder_integral(ir)
     step = max(1, len(edc) // 1000)
@@ -68,5 +64,4 @@ async def schroeder(file: Annotated[UploadFile, File(...)]):
 
 
 @router.post("/lundeby", response_model=LundebyResponse)
-async def lundeby(file: UploadFile) -> LundebyResponse:
-    ...
+async def lundeby(file: UploadFile) -> LundebyResponse: ...

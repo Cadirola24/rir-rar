@@ -11,7 +11,7 @@ class HealthResponse(BaseModel):
 
 class BandAnalysisResponse(BaseModel):
     sample_rate: int
-    duration: float                                 # segundos
+    duration: float  # segundos
     center_frequencies: list[float]
     parameters: dict[str, dict[float, float | None]]
     # {"T30": {125.0: 1.52, 250.0: 1.31, ...}, "EDT": {...}, "D50": {...}, "C80": {...}}

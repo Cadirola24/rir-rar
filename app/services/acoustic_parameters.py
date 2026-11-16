@@ -19,9 +19,7 @@ def apply_smoothing(
       (``max(1, int(window_ms * fs / 1000))`` muestras).
     """
     if method not in ("hilbert", "moving_average"):
-        raise ValueError(
-            f"Método inválido: '{method}'. Debe ser 'hilbert' o 'moving_average'."
-        )
+        raise ValueError(f"Método inválido: '{method}'. Debe ser 'hilbert' o 'moving_average'.")
     if window_ms <= 0:
         raise ValueError("window_ms debe ser un valor positivo.")
 
@@ -34,7 +32,7 @@ def apply_smoothing(
 
     m = max(1, int(window_ms * fs / 1000))
     kernel = np.ones(m, dtype=float) / m
-    mean_square = np.convolve(x ** 2, kernel, mode="full")[: len(x)]
+    mean_square = np.convolve(x**2, kernel, mode="full")[: len(x)]
     return np.sqrt(np.maximum(mean_square, 0.0))
 
 
@@ -64,7 +62,7 @@ def apply_schroeder_integral(ir: np.ndarray) -> np.ndarray:
     if h.size == 0:
         return h.copy()
 
-    energy = h ** 2
+    energy = h**2
     edc_linear = np.cumsum(energy[::-1])[::-1]
     total_energy = edc_linear[0]
 
@@ -109,7 +107,7 @@ def linear_regression(x: np.ndarray, y: np.ndarray) -> tuple[float, float, float
     dx = x_arr - x_mean
     dy = y_arr - y_mean
 
-    ss_xx = np.sum(dx ** 2)
+    ss_xx = np.sum(dx**2)
     if ss_xx == 0.0:
         raise ValueError("Todos los valores de x son iguales; pendiente indefinida.")
 
@@ -119,7 +117,7 @@ def linear_regression(x: np.ndarray, y: np.ndarray) -> tuple[float, float, float
 
     y_hat = slope * x_arr + intercept
     ss_res = np.sum((y_arr - y_hat) ** 2)
-    ss_tot = np.sum(dy ** 2)
+    ss_tot = np.sum(dy**2)
     r2 = 1.0 if ss_tot == 0.0 else float(1.0 - (ss_res / ss_tot))
 
     return slope, intercept, r2

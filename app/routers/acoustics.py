@@ -17,9 +17,7 @@ async def parameters(file: Annotated[UploadFile, File(...)]):
         try:
             ir, fs = load_audio(path)
         except ValueError as e:  # no es un audio: el pedido está mal
-            raise HTTPException(
-                status_code=422, detail=f"No es un audio válido: {e}"
-            ) from e
+            raise HTTPException(status_code=422, detail=f"No es un audio válido: {e}") from e
     params = calculate_parameters_from_ir(ir, fs)  # todas las bandas, de una vez
     return BandAnalysisResponse(
         sample_rate=fs,
