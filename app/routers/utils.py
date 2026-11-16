@@ -1,12 +1,11 @@
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
 from app.routers.audio_http import uploaded_file
-from app.schemas.utils import SchroederResponse, SmoothingMethod, SmoothingResponse
+from app.schemas.utils import SchroederResponse, SmoothingMethod, SmoothingResponse, LundebyResponse
 from app.services.acoustic_parameters import apply_schroeder_integral, apply_smoothing
 from app.services.signal_utils import load_audio
 
 router = APIRouter()
-
 
 @router.post("/smoothing", response_model=SmoothingResponse)   # POST /api/v1/utils/smoothing
 async def smoothing(

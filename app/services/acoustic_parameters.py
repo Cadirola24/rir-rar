@@ -4,44 +4,37 @@ Milestone 3: Producto final.
 """
 
 import numpy as np
-
+from scipy import signal as sp_signal
 
 def apply_smoothing(
     signal: np.ndarray, fs: int, method: str = "hilbert", window_ms: float = 10
 ) -> np.ndarray:
-    """Suaviza una senal y devuelve su envolvente en **amplitud**.
+    """Suaviza una señal y devuelve su envolvente en amplitud.
 
     - ``method='hilbert'`` (recomendado): envolvente de Hilbert,
       ``np.abs(scipy.signal.hilbert(signal))``. Ignora ``window_ms``.
-    - ``method='moving_average'``: media movil de ``window_ms`` milisegundos
-      (``int(window_ms * fs / 1000)`` muestras, al menos 1). Para que la salida
-      quede en amplitud (comparable con Hilbert), devolver la raiz de la media
-      movil de ``signal**2`` (envolvente RMS) o, alternativamente, la media
-      movil de ``|signal|``. Documentar cual se eligio.
-
-    Parameters
-    ----------
-    signal : np.ndarray
-        Senal de entrada (tipicamente una RI filtrada por banda, array 1D).
-    fs : int
-        Frecuencia de muestreo en Hz (para convertir ``window_ms`` a muestras).
-    method : str, optional
-        ``'hilbert'`` (por defecto) o ``'moving_average'``.
-    window_ms : float, optional
-        Largo de la ventana de media movil en milisegundos (por defecto 10 ms).
-
-    Returns
-    -------
-    np.ndarray
-        Envolvente en amplitud (no negativa), de la misma longitud que ``signal``.
-
-    Raises
-    ------
-    ValueError
-        Si ``method`` no es ``'hilbert'`` ni ``'moving_average'``, o si
-        ``window_ms`` no es positivo.
+    - ``method='moving_average'``: envolvente RMS calculada como la raíz de la
+      media móvil causal de ``signal**2`` con ventana de ``window_ms`` ms
+      (``max(1, int(window_ms * fs / 1000))`` muestras).
     """
-    raise NotImplementedError("Implementar en Milestone 3")
+    if method not in ("hilbert", "moving_average"):
+        raise ValueError(
+            f"Método inválido: '{method}'. Debe ser 'hilbert' o 'moving_average'."
+        )
+    if window_ms <= 0:
+        raise ValueError("window_ms debe ser un valor positivo.")
+
+    x = np.asarray(signal, dtype=float)
+    if x.size == 0:
+        return x.copy()
+
+    if method == "hilbert":
+        return np.abs(sp_signal.hilbert(x))
+
+    m = max(1, int(window_ms * fs / 1000))
+    kernel = np.ones(m, dtype=float) / m
+    mean_square = np.convolve(x ** 2, kernel, mode="full")[: len(x)]
+    return np.sqrt(np.maximum(mean_square, 0.0))
 
 
 def apply_schroeder_integral(ir: np.ndarray) -> np.ndarray:
@@ -66,7 +59,17 @@ def apply_schroeder_integral(ir: np.ndarray) -> np.ndarray:
     .. [1] Schroeder, M. R. (1965). "New method of measuring reverberation
        time." JASA 37(3), 409-412.
     """
-    raise NotImplementedError("Implementar en Milestone 3")
+    h = np.asarray(ir, dtype=float)
+    if h.size == 0:
+        return h.copy()
+
+    energy = h ** 2
+    edc_linear = np.cumsum(energy[::-1])[::-1]
+    total_energy = edc_linear[0]
+
+    eps = np.finfo(float).eps
+    edc_db = 10.0 * np.log10((edc_linear + eps) / (total_energy + eps))
+    return np.maximum(edc_db, -150.0)
 
 
 def linear_regression(x: np.ndarray, y: np.ndarray) -> tuple[float, float, float]:
@@ -91,7 +94,34 @@ def linear_regression(x: np.ndarray, y: np.ndarray) -> tuple[float, float, float
     r2 : float
         Coeficiente de determinacion R^2.
     """
-    raise NotImplementedError("Implementar en Milestone 3")
+    x_arr = np.asarray(x, dtype=float)
+    y_arr = np.asarray(y, dtype=float)
+
+    if x_arr.shape != y_arr.shape:
+        raise ValueError("x e y deben tener la misma longitud.")
+    if x_arr.size < 2:
+        raise ValueError("Se necesitan al menos 2 puntos para la regresión lineal.")
+
+    x_mean = np.mean(x_arr)
+    y_mean = np.mean(y_arr)
+
+    dx = x_arr - x_mean
+    dy = y_arr - y_mean
+
+    ss_xx = np.sum(dx ** 2)
+    if ss_xx == 0.0:
+        raise ValueError("Todos los valores de x son iguales; pendiente indefinida.")
+
+    ss_xy = np.sum(dx * dy)
+    slope = float(ss_xy / ss_xx)
+    intercept = float(y_mean - slope * x_mean)
+
+    y_hat = slope * x_arr + intercept
+    ss_res = np.sum((y_arr - y_hat) ** 2)
+    ss_tot = np.sum(dy ** 2)
+    r2 = 1.0 if ss_tot == 0.0 else float(1.0 - (ss_res / ss_tot))
+
+    return slope, intercept, r2
 
 
 def calculate_parameters_from_ir(ir: np.ndarray, fs: int) -> dict[str, dict[float, float]]:
