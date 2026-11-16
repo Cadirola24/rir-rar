@@ -35,5 +35,11 @@ async def sine_sweep(req: SineSweepRequest):
 
 @router.post("/synthetic-ir")
 async def synthetic_ir(req: SyntheticIRRequest):
-    signal = generate_synthetic_ir(req.duration, req.t60_values, req.sample_rate)
+    try:
+        signal = generate_synthetic_ir(req.duration, req.t60_values, req.sample_rate)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Banda inválida para fs = {req.sample_rate} Hz: {e}",
+        ) from e
     return wav_response(signal, req.sample_rate, filename="synthetic_ir.wav")

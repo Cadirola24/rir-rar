@@ -18,6 +18,17 @@
 * **Fragmento de código generado:** Lógica de generación del sweep logarítmico exponencial y filtro inverso con envolvente $A(t)$, esquemas de validación de entrada, la implementación concreta en el router para responder con `wav_response` según el flag `req.inverse` y Script `generate_evidences.py` utilizando `scipy.signal.spectrogram`, `scipy.signal.fftconvolve` y `matplotlib` para exportar `espectrograma_sweep.png` y `convolucion_impulso.png` a la carpeta `docs/m1/`.
 * **Modificaciones:** Se reemplazó la línea orientativa en comentarios provista por la cátedra (`# ... devolver con wav_response el sweep o el filtro inverso, según req.inverse`) por código Python funcional: evaluación condicional del booleano `req.inverse` para seleccionar la señal (`chosen_signal`), asignación dinámica de nombre de archivo (`filename`) y retorno de la respuesta mediante `wav_response(...)` y creación de la carpeta `docs/m1/` con las imágenes de validación visual y adición de los enlaces en el `README.md`.
 
+### Implementación de Reproducción y Grabación Simultánea (`app/services/audio_io.py`)
+* **Fecha:** 2026-10-23
+* **Herramienta:** Gemini
+* **Descripción del problema:** Se necesitaba implementar el Servicio 3 de M1 (`play_and_record`), para reproducir el sine sweep y grabar simultáneamente la respuesta del recinto mediante la interfaz de audio local. La función debía admitir señales mono (1D) y estéreo (2D), extender la captura más allá de la duración del sweep para registrar la cola reverberante y lanzar un `RuntimeError` informativo ante la ausencia de hardware de audio.
+* **Prompt:** Solicitud para implementar en Python la función `play_and_record(signal, fs, record_duration)` con `sounddevice.playrec`, contemplando detección automática de canales (1D/2D), relleno con ceros (*zero-padding*) para ajustar la señal a `record_duration` y captura de excepciones del dispositivo de audio.
+* **Fragmento de código generado:** Se utilizó `sd.playrec(signal_padded, samplerate=fs, channels=channels, blocking=True)`. Debido a que `playrec` registra la misma cantidad de muestras que reproduce, se implementó un relleno con ceros al final de `signal` mediante `np.pad` (adaptado tanto para arrays 1D como 2D) hasta completar `total_frames = int(record_duration * fs)`, además de un bloque `try...except` que encapsula cualquier fallo de hardware en un `RuntimeError`.
+* **Modificaciones:**
+  * **Importación local de `sounddevice`:** Se ubicó `import sounddevice as sd` dentro del cuerpo de la función en lugar del encabezado del módulo para evitar que el servidor o el entorno de integración continua (CI) fallen por ausencia de librerías de audio del sistema (PortAudio) al importar `audio_io.py` durante las pruebas automatizadas.
+  * **Alcance cliente-servidor:** Se respetó la arquitectura planteada en la consigna sin crear un endpoint HTTP para este servicio, ya que la adquisición física ocurre en la máquina del cliente.
+  * **Gestión de latencia y cola:** Si bien la implementación garantiza el registro de la cola de reverberación mediante *post-padding* hasta `record_duration`, no agrega un *pre-roll* inicial de silencio (0,5 a 1 s); el desfase inicial del driver se resuelve posteriormente al alinear el pico de la respuesta al impulso en `get_impulse_response`.
+
 ## Milestone 2 (v0.2.0)
 
 ### Endpoints de Filtrado por Octava y RI Sintética (Servicios y Routers)
@@ -51,3 +62,16 @@
 * **Prompt:** Solicitud para crear un bloque de código en Python que calcule y grafique el espectro del ruido rosa con su respectiva pendiente de regresión, para integrarlo al script existente `generate_evidences.py` y guardar la imagen en `docs/m1`.
 * **Fragmento de código generado:** Se proporcionó un bloque de código que utiliza `scipy.signal.welch` para calcular la Densidad Espectral de Potencia (PSD) y `np.polyfit` para realizar la regresión lineal entre las frecuencias de 100 Hz y 10 kHz. Se utilizó `matplotlib` con ejes semilogarítmicos (`semilogx`) para trazar la señal generada frente a la línea de tendencia ideal.
 * **Modificaciones:** Al integrar el código generado, se detectó una discrepancia en los argumentos (el código generado usaba `sample_rate`, pero la función original esperaba `fs`). Se corrigió el argumento manualmente a `fs=fs` para evitar un `TypeError`. Posteriormente, se ejecutó exitosamente el script aislando las dependencias mediante el comando `uv run python`.
+
+## Milestone 3 (v1.0.0)
+
+### Manejo de Excepciones por Frecuencia de Nyquist en `/synthetic-ir` (`app/routers/signals.py`)
+* **Fecha:** 2026-11-15
+* **Herramienta:** Gemini
+* **Descripción del problema:** Ante una petición `POST` al endpoint `/api/v1/signals/synthetic-ir` con una banda de octava cuya frecuencia de corte superior superaba el límite de Nyquist (por ejemplo, `{"16000": 1.0}` a $f_s = 44100\text{ Hz}$), el servicio `generate_synthetic_ir` lanzaba un `ValueError` no capturado en el router. Esto provocaba un `500 Internal Server Error` en lugar de devolver un código `422 Unprocessable Entity` para parámetros inválidos.
+* **Prompt:** Solicitud para adaptar el manejo de excepciones en `app/routers/signals.py` siguiendo el patrón implementado en `app/routers/filters.py`, junto con su correspondiente test de regresión.
+* **Fragmento de código generado:** Se envolvió la invocación a `generate_synthetic_ir(req.duration, req.t60_values, req.sample_rate)` dentro de un bloque `try...except ValueError as e` en `app/routers/signals.py` para lanzar `HTTPException(status_code=422, detail=...) from e`. Asimismo, se incorporó el test `test_synthetic_ir_band_above_nyquist_returns_422` en `tests/test_api.py`.
+* **Modificaciones:**
+  * **Compatibilidad con el schema Pydantic:** Se verificó que `SyntheticIRRequest` utiliza el atributo `req.sample_rate` (en lugar de `fs`), adaptando tanto la llamada al servicio como el mensaje de error HTTP para evitar un `AttributeError`.
+  * **Cumplimiento de reglas de linter (`ruff`):** Se conservó el encadenamiento explícito de excepciones (`from e`) tal como en `app/routers/filters.py` para cumplir con la regla `B904` y evitar fallos en el pipeline de CI.
+  * **Cobertura de pruebas:** Se ejecutaron `uv run ruff check` y `uv run pytest -v` para validar que el nuevo caso borde quede cubierto sin afectar los endpoints existentes.
