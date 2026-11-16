@@ -164,3 +164,12 @@
 * **Modificaciones:**
   * **Normalización de entrada y manejo de Nyquist:** Se agregó la conversión automática a mono (`mean(axis=1)`) y validación de señal vacía o `fs <= 0` al inicio de `filter_all_octave_bands` para capturar `ValueError` y retornar `422 Unprocessable Entity`, mientras que las bandas por encima de Nyquist se omiten limpiamente sin producir errores `500`.
   * **Organización PEP 8 y cumplimiento de linter (`ruff`):** Se ubicó la constante `STANDARD_OCTAVE_BANDS` a nivel de módulo debajo de los `import`, se utilizaron anotaciones `Annotated[..., File(...)]` y `Annotated[..., Form(...)]` (regla `B008`) y se encadenaron excepciones con `raise ... from e` (regla `B904`).
+
+### Pruebas Automatizadas para Endpoints Opcionales (`tests/test_api.py`)
+* **Fecha:** 2026-11-16
+* **Herramienta:** Gemini
+* **Descripción del problema:** Al incorporar los nuevos endpoints opcionales (`GET /api/v1/filters/frequencies`, `POST /api/v1/utils/log-scale` y `POST /api/v1/filters/band`), era necesario cubrir sus rutas felices (`200 OK`) y sus casos de error (`422 Unprocessable Entity`) en la suite de tests para asegurar el cumplimiento del umbral mínimo de cobertura ($\ge 80\%$) exigido por la cátedra.
+* **Prompt:** Solicitud para generar casos de prueba en `tests/test_api.py` para validar respuestas exitosas, filtrado por Nyquist y manejo de archivos o parámetros inválidos.
+* **Fragmento de código generado:** Se añadieron tres funciones de prueba al final de `tests/test_api.py`: `test_filters_frequencies_endpoint` (verificando el listado completo de bandas de octava, el filtrado con `sample_rate=8000` y el rechazo `422` con `sample_rate=0`), `test_utils_log_scale_endpoint` (comprobando que los valores en `signal_db` respeten el techo de $0\text{ dB}$ y el piso `floor_db`) y `test_filters_all_bands_endpoint` (validando la correspondencia entre `center_frequencies` y las claves de `bands`).
+* **Modificaciones:**
+  * **Reutilización de utilidades internas de test:** Se reemplazaron los fixtures genéricos por los helpers propios del módulo (`_wav_en_memoria` y `_ri_sintetica`), manteniendo la coherencia con el resto de los tests de M3 y validando el pipeline completo mediante `uv run ruff check` y `uv run pytest --cov=app`.
