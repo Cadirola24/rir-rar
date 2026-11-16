@@ -385,7 +385,7 @@ o con un archivo `.env` en la raiz (ignorado por git).
 ---
 
 ### Evidencias visuales (`docs/m2/`)
-
+Se utilizaron dos archivos de respuestas al impulso reales extraidos de la pagina MIT IR Survey (https://mcdermottlab.mit.edu/Reverb/IR_Survey.html)
 #### 1. Deconvolución de RI Sintética
 Superposición temporal entre la RI sintética original y la recuperada tras convolución con *sine sweep* y filtrado inverso (alineación compensada por correlación cruzada):
 
