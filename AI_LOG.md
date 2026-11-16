@@ -99,6 +99,7 @@
   * **Consistencia de firmas y reutilización interna:** Se respetó la firma `apply_lundeby(ir, fs) -> tuple[int, float]` de la especificación (a diferencia de la API de referencia que recibe `max_tries` y devuelve segundos) y se reutilizó la función `linear_regression(x, y)` del Servicio 3 respetando el orden matemático de sus argumentos.
   * **Estructura de esquemas y manejo de errores HTTP:** Se creó `app/schemas/utils.py` (inexistente hasta M2) y se protegieron las llamadas a `load_audio` y `apply_lundeby` en `app/routers/utils.py` capturando `ValueError` con encadenamiento `from e` para retornar `422 Unprocessable Entity` sin infringir las reglas de `ruff`.
   * **Cobertura de tests:** Se añadieron casos de prueba para respuestas exitosas (`200`) y archivos inválidos (`422`) con el objetivo de sostener la cobertura superior al $80\%$ exigida en `routers/utils.py` y `acoustic_parameters.py`.
+
 ### Implementación de Servicios de Análisis Acústico: Suavizado, Schroeder y Regresión Lineal (`app/services/acoustic_parameters.py`)
 * **Fecha:** 2026-11-15
 * **Herramienta:** Gemini
@@ -133,3 +134,42 @@
   * **Extensión temporal y anotaciones en curva de Schroeder:** Se amplió el eje temporal hasta la duración real completa de `ri_larga.wav` ($1.78\text{ s}$) y se agregaron marcadores en los umbrales de regresión ($0$, $-5$, $-10$, $-25$ y $-35\text{ dB}$) junto con la recta extrapolada de `EDT`.
   * **Separación de tablas y análisis físico en `README.md`:** Se dividieron los resultados en tablas individuales por parámetro (`EDT`, `T20`, `T30`, `C80`) para ambas señales y se incorporó una nota técnica justificando las diferencias puntuales en bandas graves de la RI sintética debido al filtrado de fase cero (`sosfiltfilt`) frente a los filtros causales de `REW`.
   * **Formateo y linting:** Se ejecutó `uv run ruff format` y `uv run ruff check --fix` sobre los scripts auxiliares para cumplir con el límite de 100 caracteres por línea antes del merge final a `main`[cite: 60].
+
+### Implementación del Endpoint Opcional `GET /filters/frequencies` (`app/schemas/filters.py`, `app/routers/filters.py`)
+* **Fecha:** 2026-11-16
+* **Herramienta:** Gemini
+* **Descripción del problema:** Se necesitaba implementar el endpoint `GET /api/v1/filters/frequencies` para consultar las frecuencias centrales estándar de bandas de octava y tercio de octava IEC 61260 soportadas por la API, permitiendo además filtrar dinámicamente aquellas que entran por debajo del límite de Nyquist al recibir un parámetro opcional `sample_rate`.
+* **Prompt:** Solicitud para implementar el schema Pydantic de salida (`FrequenciesResponse`), la ruta `GET /frequencies` en `app/routers/filters.py` con validación por query param y los comandos `curl` de ejemplo para documentar su uso en el `README.md`.
+* **Fragmento de código generado:** Se definió el modelo `FrequenciesResponse` con los campos `sample_rate`, `octave_bands` y `third_octave_bands` junto a sus descripciones OpenAPI. En `app/routers/filters.py` se agregaron las constantes estándar de octava ($31.5\text{ Hz}$ a $16\text{ kHz}$) y tercio de octava ($25\text{ Hz}$ a $20\text{ kHz}$) y la ruta `@router.get("/frequencies", response_model=FrequenciesResponse)` con `Query(default=None, gt=0)` para filtrar bandas según $f_c \cdot 2^{1/2} < f_s / 2$ y $f_c \cdot 2^{1/6} < f_s / 2$.
+* **Modificaciones:**
+  * **Cumplimiento de reglas de linter (`ruff`):** Se dividió el string de `description` dentro de `Query(...)` mediante concatenación implícita entre paréntesis para respetar el límite máximo de longitud de línea (`E501`) configurado en el proyecto.
+  * **Validación automática de parámetros y documentación:** Se aprovechó `Query(..., gt=0)` para delegar en FastAPI/Pydantic el rechazo con `422 Unprocessable Entity` ante frecuencias de muestreo nulas o negativas, dejando el endpoint expuesto automáticamente en Swagger (`/docs`) y ReDoc (`/redoc`).
+
+### Implementación del Endpoint Opcional `POST /filters/band` (`app/services/filter.py`, `app/schemas/filters.py`, `app/routers/filters.py`)
+* **Fecha:** 2026-11-16
+* **Herramienta:** Gemini
+* **Descripción del problema:** Se necesitaba implementar el endpoint `POST /api/v1/filters/band` para descomponer y filtrar una señal de audio en todas las bandas de octava estándar (125 Hz a 4000 Hz) en una sola petición, omitiendo de manera segura aquellas bandas cuya frecuencia de corte superior supere el límite de Nyquist.
+* **Prompt:** Solicitud para implementar el servicio de filtrado multibanda (`filter_all_octave_bands`), su modelo Pydantic de respuesta (`MultiBandFilterResponse`), la ruta `POST /band` en `app/routers/filters.py` con decimación de salida y el comando `curl` de prueba.
+* **Fragmento de código generado:** Se definió `filter_all_octave_bands(signal, fs, order=4)` en `app/services/filter.py` reutilizando `filter_single_band` sobre la constante `STANDARD_OCTAVE_BANDS` con verificación preventiva de Nyquist ($f_c \cdot \sqrt{2} < f_s / 2$). En `app/schemas/filters.py` se creó `MultiBandFilterResponse` (`sample_rate`, `order`, `center_frequencies`, `time_step`, `bands`) y en `app/routers/filters.py` se agregó `@router.post("/band", response_model=MultiBandFilterResponse)` submuestreando cada banda a un máximo aproximado de 1000 puntos.
+* **Modificaciones:**
+  * **Normalización de entrada y manejo de Nyquist:** Se agregó la conversión automática a mono (`mean(axis=1)`) y validación de señal vacía o `fs <= 0` al inicio de `filter_all_octave_bands` para capturar `ValueError` y retornar `422 Unprocessable Entity`, mientras que las bandas por encima de Nyquist se omiten limpiamente sin producir errores `500`.
+  * **Organización PEP 8 y cumplimiento de linter (`ruff`):** Se ubicó la constante `STANDARD_OCTAVE_BANDS` a nivel de módulo debajo de los `import`, se utilizaron anotaciones `Annotated[..., File(...)]` y `Annotated[..., Form(...)]` (regla `B008`) y se encadenaron excepciones con `raise ... from e` (regla `B904`).
+
+### Pruebas Automatizadas para Endpoints Opcionales (`tests/test_api.py`)
+* **Fecha:** 2026-11-16
+* **Herramienta:** Gemini
+* **Descripción del problema:** Al incorporar los nuevos endpoints opcionales (`GET /api/v1/filters/frequencies`, `POST /api/v1/utils/log-scale` y `POST /api/v1/filters/band`), era necesario cubrir sus rutas felices (`200 OK`) y sus casos de error (`422 Unprocessable Entity`) en la suite de tests para asegurar el cumplimiento del umbral mínimo de cobertura ($\ge 80\%$) exigido por la cátedra.
+* **Prompt:** Solicitud para generar casos de prueba en `tests/test_api.py` para validar respuestas exitosas, filtrado por Nyquist y manejo de archivos o parámetros inválidos.
+* **Fragmento de código generado:** Se añadieron tres funciones de prueba al final de `tests/test_api.py`: `test_filters_frequencies_endpoint` (verificando el listado completo de bandas de octava, el filtrado con `sample_rate=8000` y el rechazo `422` con `sample_rate=0`), `test_utils_log_scale_endpoint` (comprobando que los valores en `signal_db` respeten el techo de $0\text{ dB}$ y el piso `floor_db`) y `test_filters_all_bands_endpoint` (validando la correspondencia entre `center_frequencies` y las claves de `bands`).
+* **Modificaciones:**
+  * **Reutilización de utilidades internas de test:** Se reemplazaron los fixtures genéricos por los helpers propios del módulo (`_wav_en_memoria` y `_ri_sintetica`), manteniendo la coherencia con el resto de los tests de M3 y validando el pipeline completo mediante `uv run ruff check` y `uv run pytest --cov=app`.
+
+  ### Implementación del Endpoint Integrador `POST /analysis/impulse-response` (`app/schemas/analysis.py`, `app/routers/analysis.py`, `app/main.py`, `tests/test_api.py`)
+* **Fecha:** 2026-11-16
+* **Herramienta:** Gemini
+* **Descripción del problema:** Se necesitaba implementar el endpoint integrador `POST /api/v1/analysis/impulse-response` para ejecutar en una sola petición HTTP el flujo completo de análisis de una Respuesta al Impulso (RI), evitando múltiples subidas del archivo de audio y consolidando en una única respuesta JSON el punto de corte por piso de ruido (Lundeby), la curva de decaimiento energético global (Schroeder) y los parámetros acústicos ISO 3382-1 por banda de octava.
+* **Prompt:** Solicitud para diseñar los modelos Pydantic de salida (`app/schemas/analysis.py`), crear el router dedicado (`app/routers/analysis.py`), registrarlo en `app/main.py` y agregar los tests de validación en `tests/test_api.py`.
+* **Fragmento de código generado:** Se definieron los esquemas `LundebySummary`, `SchroederSummary` e `ImpulseResponseAnalysisResponse` en `app/schemas/analysis.py`. En `app/routers/analysis.py` se expuso `@router.post("/impulse-response", response_model=ImpulseResponseAnalysisResponse)` orquestando secuencialmente `load_audio`, `apply_lundeby`, `apply_schroeder_integral` y `calculate_parameters_from_ir` sobre la señal cargada una única vez en memoria, y se montó el router bajo `/api/v1/analysis` en `app/main.py`.
+* **Modificaciones:**
+  * **Reutilización de servicios DSP y validación HTTP:** Se delegó todo el procesamiento numérico a los servicios existentes en `app/services/acoustic_parameters.py` sin duplicar lógica de cálculo, encapsulando los `ValueError` de lectura o validación de señal en respuestas `422 Unprocessable Entity` con encadenamiento explícito (`raise ... from e`).
+  * **Cobertura de pruebas y documentación:** Se incorporó `test_analysis_impulse_response_endpoint` en `tests/test_api.py` para validar tanto el análisis exitoso (`200 OK`) sobre una RI sintética como el rechazo ante archivos inválidos (`422`), además de añadir la sección correspondiente con su comando `curl` en el `README.md`.

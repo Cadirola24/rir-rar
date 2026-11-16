@@ -1,6 +1,6 @@
 from enum import StrEnum
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class SmoothingMethod(StrEnum):
@@ -28,3 +28,13 @@ class LundebyResponse(BaseModel):
     cutoff_index: int  # muestra del cruce (lo que devuelve apply_lundeby)
     cutoff_time: float  # segundos
     noise_level_db: float
+
+
+class LogScaleResponse(BaseModel):
+    sample_rate: int = Field(..., gt=0, description="Frecuencia de muestreo en Hz.")
+    floor_db: float = Field(..., description="Piso mínimo en dB aplicado al recorte.")
+    time_step: float = Field(..., gt=0, description="Paso temporal entre muestras diezmadas (s).")
+    signal_db: list[float] = Field(
+        ...,
+        description="Amplitud normalizada en escala logarítmica (dB), diezmada.",
+    )

@@ -222,3 +222,69 @@ def test_utils_lundeby_invalid_file_returns_422():
         files={"file": ("not_audio.txt", b"contenido invalido", "text/plain")},
     )
     assert response.status_code == 422
+
+
+def test_filters_frequencies_endpoint():
+    """/api/v1/filters/frequencies devuelve bandas estandar y filtra por Nyquist."""
+    res_all = client.get("/api/v1/filters/frequencies")
+    assert res_all.status_code == 200
+    assert 16000.0 in res_all.json()["octave_bands"]
+
+    res_nyquist = client.get("/api/v1/filters/frequencies?sample_rate=8000")
+    assert res_nyquist.status_code == 200
+    assert 4000.0 not in res_nyquist.json()["octave_bands"]
+
+    res_invalid = client.get("/api/v1/filters/frequencies?sample_rate=0")
+    assert res_invalid.status_code == 422
+
+
+def test_utils_log_scale_endpoint():
+    """/api/v1/utils/log-scale devuelve la amplitud normalizada en dB."""
+    fs = 44100
+    archivos = {"file": ("ir.wav", _wav_en_memoria(_ri_sintetica(fs), fs), "audio/wav")}
+    res_ok = client.post("/api/v1/utils/log-scale", files=archivos, data={"floor_db": -100.0})
+    assert res_ok.status_code == 200
+    body = res_ok.json()
+    assert max(body["signal_db"]) <= 0.0
+    assert min(body["signal_db"]) >= -100.0
+
+    res_bad = client.post(
+        "/api/v1/utils/log-scale",
+        files={"file": ("not_audio.txt", b"contenido invalido", "text/plain")},
+    )
+    assert res_bad.status_code == 422
+
+
+def test_filters_all_bands_endpoint():
+    """/api/v1/filters/band filtra todas las bandas de octava validas."""
+    fs = 44100
+    archivos = {"file": ("ir.wav", _wav_en_memoria(_ri_sintetica(fs), fs), "audio/wav")}
+    res_ok = client.post("/api/v1/filters/band", files=archivos, data={"order": 4})
+    assert res_ok.status_code == 200
+    body = res_ok.json()
+    assert len(body["center_frequencies"]) > 0
+    assert set(body["bands"].keys()) == {str(f) for f in body["center_frequencies"]}
+
+    res_bad = client.post(
+        "/api/v1/filters/band",
+        files={"file": ("not_audio.txt", b"contenido invalido", "text/plain")},
+    )
+    assert res_bad.status_code == 422
+
+
+def test_analysis_impulse_response_endpoint():
+    """/api/v1/analysis/impulse-response devuelve Lundeby, Schroeder y parametros ISO."""
+    fs = 44100
+    archivos = {"file": ("ir.wav", _wav_en_memoria(_ri_sintetica(fs), fs), "audio/wav")}
+    res_ok = client.post("/api/v1/analysis/impulse-response", files=archivos)
+    assert res_ok.status_code == 200
+    body = res_ok.json()
+    assert "lundeby" in body
+    assert "schroeder" in body
+    assert "acoustic_parameters" in body
+
+    res_bad = client.post(
+        "/api/v1/analysis/impulse-response",
+        files={"file": ("not_audio.txt", b"contenido invalido", "text/plain")},
+    )
+    assert res_bad.status_code == 422

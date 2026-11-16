@@ -36,6 +36,8 @@ def apply_smoothing(
         raise ValueError("window_ms debe ser un valor positivo.")
 
     x = np.asarray(signal, dtype=float)
+    if x.ndim > 1:
+        x = x.mean(axis=1)
     if x.size == 0:
         return x.copy()
 
@@ -71,6 +73,8 @@ def apply_schroeder_integral(ir: np.ndarray) -> np.ndarray:
        time." JASA 37(3), 409-412.
     """
     h = np.asarray(ir, dtype=float)
+    if h.ndim > 1:
+        h = h.mean(axis=1)
     if h.size == 0:
         return h.copy()
 
