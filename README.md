@@ -27,6 +27,7 @@ desde la limpieza y filtrado de la señal de excitación, hasta la obtención de
 |Cadirola Valentino|80692|Dev|Servicios, Routers y Schemas para M1, implementación principal de M2, generación de documentación para M1 y M2, Servicios y Routers para M3
 |Collado Horlent Vicente|80478|Reviewer / QA|Servicios M1, corrección de fallas en milestones previos, Review y Merge de Pull Request, Servicios y documentación para M3
 |Pascuccelli Tadeo|72794|Integrador| Servicios M1, Servicios y Schemas para M3, Review y corrección de bugs para M3 
+
 ## Requisitos previos
 
 - Python 3.12 o superior
@@ -112,22 +113,6 @@ curl -X 'POST' \
 }' --output ri_sintetica.wav
 ```
 
-#### Frecuencias centrales de octava y/o tercio de octava soportadas por el banco de filtros
-Para probarlo sin parámetros, eliminar `?sample_rate=44100`
-
-```bash
-curl -X GET \
-  "http://localhost:8000/api/v1/filters/frequencies?sample_rate=44100"
-```
-
-#### Filtrado multibanda
-
-```bash
-curl -X POST "http://localhost:8000/api/v1/filters/band" \
-  -F "file=@thx-sound-test.wav" \
-  -F "order=4"
-```
-
 #### Filtrado por Banda
 Sube un archivo de audio WAV y devuelve la señal filtrada en la banda especificada.
 
@@ -136,7 +121,7 @@ curl -X 'POST' \
   'http://localhost:8000/api/v1/filters/single-band' \
   -H 'accept: audio/wav' \
   -H 'Content-Type: multipart/form-data' \
-  -F 'file=@thx-sound-test.wav' \
+  -F 'file=@tests/data/thx-sound-test.wav' \
   -F 'center_freq=1000' \
   --output ir_filtrada.wav
 ```
@@ -149,16 +134,16 @@ ri_corta.wav y ri_larga.wav son intercambiables, cualquier endpoint de M3 puede 
 **Con transformada de Hilbert** (no requiere ventana temporal):
 
 ```bash
-  curl -X POST "http://localhost:8000/api/v1/utils/smoothing" \
-    -F "file=@ri_corta.wav" \
+curl -X POST "http://localhost:8000/api/v1/utils/smoothing" \
+    -F "file=@tests/data/ri_corta.wav" \
     -F "method=hilbert"
 ```
 
 **Con media móvil** (permite especificar el ancho de ventana en milisegundos mediante window_ms):
 
 ```bash
-  curl -X POST "http://localhost:8000/api/v1/utils/smoothing" \
-  -F "file=@ri_corta.wav" \
+curl -X POST "http://localhost:8000/api/v1/utils/smoothing" \
+  -F "file=@tests/data/ri_corta.wav" \
   -F "method=moving_average" \
   -F "window_ms=10"
 ```
@@ -166,38 +151,55 @@ ri_corta.wav y ri_larga.wav son intercambiables, cualquier endpoint de M3 puede 
 #### Integral de Schroeder
 
 ```bash
-  curl -X POST "http://localhost:8000/api/v1/utils/schroeder" \
-  -F "file=@ri_larga.wav"
+curl -X POST "http://localhost:8000/api/v1/utils/schroeder" \
+  -F "file=@tests/data/ri_larga.wav"
 ```
 
 #### Truncamiento de Lundeby
 
 ```bash
-  curl -X POST "http://localhost:8000/api/v1/utils/lundeby" \
-  -F "file=@ri_larga.wav"
+curl -X POST "http://localhost:8000/api/v1/utils/lundeby" \
+  -F "file=@tests/data/ri_larga.wav"
 ```
 
 #### Parámetros acústicos
 
 ```bash
-  curl -X POST "http://localhost:8000/api/v1/acoustics/parameters" \
-  -F "file=@ri_corta.wav"
-```
-
-#### Conversión a escala logarítmica normalizada
-
-```bash
-  curl -X POST "http://localhost:8000/api/v1/utils/log-scale" \
-  -F "file=@tests/data/thx-sound-test.wav" \
-  -F "floor_db=-120"
+curl -X POST "http://localhost:8000/api/v1/acoustics/parameters" \
+  -F "file=@tests/data/ri_corta.wav"
 ```
 
 #### Análisis Completo de Respuesta al Impulso
-Ejecuta en una única petición la detección de cruce con piso de ruido (Lundeby), la curva de decaimiento energético global (Schroeder) y el cálculo de parámetros acústicos ISO 3382-1 por banda de octava:
+Con una única petición devuelve la detección de cruce con piso de ruido (Lundeby), la curva de decaimiento energético global (Schroeder) y el cálculo de parámetros acústicos ISO 3382-1 por banda de octava
 
 ```bash
 curl -X POST "http://localhost:8000/api/v1/analysis/impulse-response" \
-  -F "file=@ri_larga.wav"
+  -F "file=@tests/data/ri_larga.wav"
+```
+
+#### Frecuencias centrales de octava y/o tercio de octava soportadas por el banco de filtros
+Para probarlo sin parámetros, eliminar `?sample_rate=44100`
+
+```bash
+curl -X GET \
+  "http://localhost:8000/api/v1/filters/frequencies?sample_rate=44100"
+```
+
+#### Filtrado multibanda
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/filters/band" \
+  -F "file=@tests/data/thx-sound-test.wav" \
+  -F "order=4"
+```
+
+#### Conversión a escala logarítmica normalizada
+Ya existía como servicio en M2, para M3 se agregó su endpoint
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/utils/log-scale" \
+  -F "file=@tests/data/thx-sound-test.wav" \
+  -F "floor_db=-120"
 ```
 
 ## Estructura del proyecto
