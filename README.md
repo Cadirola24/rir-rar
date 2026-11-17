@@ -401,6 +401,7 @@ o con un archivo `.env` en la raiz (ignorado por git).
 ![Convolución Impulso](docs/m1/convolucion_impulso.png)
 
 ### Prueba de Reproducción y Grabación Simultánea
+Se utilizó una placa de audio U_PHORIA UMC202HD en un canal mono grabada con un microfono Behringer Ultravoice XM8500 a una taza de muestreo de 44100 Hz y un Buffer Size de 256 Samples.
 ![Prueba de Grabación Real](docs/m1/prueba_grabacion.png)
 
 ### Espectro del Ruido Rosa (-3 dB/octava)
