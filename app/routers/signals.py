@@ -9,12 +9,14 @@ from app.services.sine_sweep import generate_sine_sweep_pair
 router = APIRouter()
 
 
+# POST /api/v1/signals/pink-noise
 @router.post("/pink-noise")
 async def pink_noise(req: PinkNoiseRequest):
     audio = generate_pink_noise(req.duration, req.sample_rate)
     return wav_response(audio, req.sample_rate, "pink_noise.wav")
 
 
+# POST /api/v1/signals/sine-sweep
 @router.post("/sine-sweep")
 async def sine_sweep(req: SineSweepRequest):
     if req.start_freq >= req.end_freq:
@@ -33,6 +35,7 @@ async def sine_sweep(req: SineSweepRequest):
     return wav_response(chosen_signal, req.sample_rate, filename)
 
 
+# POST /api/v1/signals/synthetic-ir
 @router.post("/synthetic-ir")
 async def synthetic_ir(req: SyntheticIRRequest):
     try:

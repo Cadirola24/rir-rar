@@ -112,6 +112,22 @@ curl -X 'POST' \
 }' --output ri_sintetica.wav
 ```
 
+#### Frecuencias centrales de octava y/o tercio de octava soportadas por el banco de filtros
+Para probarlo sin parámetros, eliminar `?sample_rate=44100`
+
+```bash
+curl -X GET \
+  "http://localhost:8000/api/v1/filters/frequencies?sample_rate=44100"
+```
+
+#### Filtrado multibanda
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/filters/band" \
+  -F "file=@thx-sound-test.wav" \
+  -F "order=4"
+```
+
 #### Filtrado por Banda
 Sube un archivo de audio WAV y devuelve la señal filtrada en la banda especificada.
 
@@ -120,12 +136,13 @@ curl -X 'POST' \
   'http://localhost:8000/api/v1/filters/single-band' \
   -H 'accept: audio/wav' \
   -H 'Content-Type: multipart/form-data' \
-  -F 'file=@tests/data/thx-sound-test.wav' \
+  -F 'file=@thx-sound-test.wav' \
   -F 'center_freq=1000' \
   --output ir_filtrada.wav
 ```
 
 ### M3: Producto Final
+ri_corta.wav y ri_larga.wav son intercambiables, cualquier endpoint de M3 puede probarse con las dos
 
 #### Suavizado de señal
 
@@ -164,7 +181,23 @@ curl -X 'POST' \
 
 ```bash
   curl -X POST "http://localhost:8000/api/v1/acoustics/parameters" \
-  -F "file=@respuesta_impulso.wav"
+  -F "file=@ri_corta.wav"
+```
+
+#### Conversión a escala logarítmica normalizada
+
+```bash
+  curl -X POST "http://localhost:8000/api/v1/utils/log-scale" \
+  -F "file=@tests/data/thx-sound-test.wav" \
+  -F "floor_db=-120"
+```
+
+#### Análisis Completo de Respuesta al Impulso
+Ejecuta en una única petición la detección de cruce con piso de ruido (Lundeby), la curva de decaimiento energético global (Schroeder) y el cálculo de parámetros acústicos ISO 3382-1 por banda de octava:
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/analysis/impulse-response" \
+  -F "file=@ri_larga.wav"
 ```
 
 ## Estructura del proyecto
@@ -180,14 +213,16 @@ rir-rar/
 │   │   ├── health.py              # GET /health (M0)
 │   │   ├── audio_http.py          # wav_response y uploaded_file (ya resueltas)
 │   │   ├── signals.py             # POST /api/v1/signals/pink-noise, POST /api/v1/signals/sine-sweep y POST /api/v1/signals/synthetic-ir
-│   │   ├── filters.py             # POST /api/v1/filters/single-band
+│   │   ├── filters.py             # POST /api/v1/filters/frequencies, POST /api/v1/filters/band y POST /api/v1/filters/single-band
 │   │   ├── acoustics.py           # POST /api/v1/acoustics/parameters
-│   │   └── utils.py               # POST /api/v1/utils/smoothing, POST /api/v1/utils/schroeder y POST /api/v1/utils/lundeby
+│   │   ├── utils.py               # POST /api/v1/utils/smoothing, POST /api/v1/utils/schroeder y POST /api/v1/utils/lundeby y POST /api/v1/utils/log-scale
+│   │   └──analysis.py             # POST /api/v1/analysis/impulse-response
 │   ├── schemas/
 │   │   ├── __init__.py            # Modelos Pydantic de request/response (desde M1)
 │   │   ├── signals.py             # PinkNoiseRequest, SineSweepRequest y SyntheticIRRequest
-│   │   ├── responses.py           # HealthResponse y BandAnalysisResponse
-│   │   └── utils.py               # SmoothingMethod, SmoothingResponse, SchroederResponse y LundebyResponse
+│   │   ├── responses.py           # HealthResponse, BandAnalysisResponse, FrequenciesResponse y MultiBandFilterResponse
+│   │   ├── utils.py               # SmoothingMethod, SmoothingResponse, SchroederResponse, LundebyResponse y LogScaleResponse
+│   │   └── analysis.py            # LundebySummary, SchroederSummary y ImpulseResponseAnalysisResponse
 │   └── services/
 │       ├── __init__.py
 │       ├── pink_noise.py          # generate_pink_noise (M1)
@@ -220,7 +255,7 @@ rir-rar/
 ├── AI_LOG.md                      # Documentación de uso de IA
 ├── generate_evidences_m1.py          # Generación de documentación para M1
 ├── generate_evidences_m2.py       # Generación de documentación para M2
-└── generate_evidences_m3.py       # Generación de documentación para M2
+└── generate_evidences_m3.py       # Generación de documentación para M3
 ```
 
 Cada milestone expone lo que construye: los routers y schemas de `signals` se agregan en M1
