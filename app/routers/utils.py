@@ -4,6 +4,7 @@ from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
 from app.routers.audio_http import uploaded_file
 from app.schemas.utils import (
+    LogScaleResponse,
     LundebyResponse,
     SchroederResponse,
     SmoothingMethod,
@@ -14,7 +15,7 @@ from app.services.acoustic_parameters import (
     apply_schroeder_integral,
     apply_smoothing,
 )
-from app.services.signal_utils import load_audio
+from app.services.signal_utils import load_audio, logarithmic_scale_conversion
 
 router = APIRouter()
 
@@ -85,4 +86,29 @@ async def lundeby(file: UploadFile = File(...)) -> LundebyResponse:  # noqa: B00
         cutoff_index=index,
         cutoff_time=round(index / fs, 6),
         noise_level_db=noise_level_db,
+    )
+
+
+# POST /api/v1/utils/log-scale
+@router.post("/log-scale", response_model=LogScaleResponse)
+async def log_scale(
+    file: Annotated[UploadFile, File(...)],
+    floor_db: Annotated[float, Form(lt=0, ge=-200)] = -120.0,
+):
+    with uploaded_file(file) as path:
+        try:
+            ir, fs = load_audio(path)
+        except ValueError as e:
+            raise HTTPException(status_code=422, detail=f"No es un audio válido: {e}") from e
+
+    signal_db = logarithmic_scale_conversion(ir, floor_db=floor_db)
+
+    step = max(1, len(signal_db) // 1000)
+    signal_decimated = signal_db[::step]
+
+    return LogScaleResponse(
+        sample_rate=fs,
+        floor_db=floor_db,
+        time_step=step / fs,
+        signal_db=signal_decimated.tolist(),
     )

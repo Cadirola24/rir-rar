@@ -27,6 +27,7 @@ desde la limpieza y filtrado de la señal de excitación, hasta la obtención de
 |Cadirola Valentino|80692|Dev|Servicios, Routers y Schemas para M1, implementación principal de M2, generación de documentación para M1 y M2, Servicios y Routers para M3
 |Collado Horlent Vicente|80478|Reviewer / QA|Servicios M1, corrección de fallas en milestones previos, Review y Merge de Pull Request, Servicios y documentación para M3
 |Pascuccelli Tadeo|72794|Integrador| Servicios M1, Servicios y Schemas para M3, Review y corrección de bugs para M3 
+
 ## Requisitos previos
 
 - Python 3.12 o superior
@@ -133,16 +134,16 @@ ri_corta.wav y ri_larga.wav son intercambiables, cualquier endpoint de M3 puede 
 **Con transformada de Hilbert** (no requiere ventana temporal):
 
 ```bash
-  curl -X POST "http://localhost:8000/api/v1/utils/smoothing" \
-    -F "file=@ri_corta.wav" \
+curl -X POST "http://localhost:8000/api/v1/utils/smoothing" \
+    -F "file=@tests/data/ri_corta.wav" \
     -F "method=hilbert"
 ```
 
 **Con media móvil** (permite especificar el ancho de ventana en milisegundos mediante window_ms):
 
 ```bash
-  curl -X POST "http://localhost:8000/api/v1/utils/smoothing" \
-  -F "file=@ri_corta.wav" \
+curl -X POST "http://localhost:8000/api/v1/utils/smoothing" \
+  -F "file=@tests/data/ri_corta.wav" \
   -F "method=moving_average" \
   -F "window_ms=10"
 ```
@@ -150,22 +151,55 @@ ri_corta.wav y ri_larga.wav son intercambiables, cualquier endpoint de M3 puede 
 #### Integral de Schroeder
 
 ```bash
-  curl -X POST "http://localhost:8000/api/v1/utils/schroeder" \
-  -F "file=@ri_larga.wav"
+curl -X POST "http://localhost:8000/api/v1/utils/schroeder" \
+  -F "file=@tests/data/ri_larga.wav"
 ```
 
 #### Truncamiento de Lundeby
 
 ```bash
-  curl -X POST "http://localhost:8000/api/v1/utils/lundeby" \
-  -F "file=@ri_larga.wav"
+curl -X POST "http://localhost:8000/api/v1/utils/lundeby" \
+  -F "file=@tests/data/ri_larga.wav"
 ```
 
 #### Parámetros acústicos
 
 ```bash
-  curl -X POST "http://localhost:8000/api/v1/acoustics/parameters" \
-  -F "file=@ri_corta.wav"
+curl -X POST "http://localhost:8000/api/v1/acoustics/parameters" \
+  -F "file=@tests/data/ri_corta.wav"
+```
+
+#### Análisis Completo de Respuesta al Impulso
+Con una única petición devuelve la detección de cruce con piso de ruido (Lundeby), la curva de decaimiento energético global (Schroeder) y el cálculo de parámetros acústicos ISO 3382-1 por banda de octava
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/analysis/impulse-response" \
+  -F "file=@tests/data/ri_larga.wav"
+```
+
+#### Frecuencias centrales de octava y/o tercio de octava soportadas por el banco de filtros
+Para probarlo sin parámetros, eliminar `?sample_rate=44100`
+
+```bash
+curl -X GET \
+  "http://localhost:8000/api/v1/filters/frequencies?sample_rate=44100"
+```
+
+#### Filtrado multibanda
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/filters/band" \
+  -F "file=@tests/data/thx-sound-test.wav" \
+  -F "order=4"
+```
+
+#### Conversión a escala logarítmica normalizada
+Ya existía como servicio en M2, para M3 se agregó su endpoint
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/utils/log-scale" \
+  -F "file=@tests/data/thx-sound-test.wav" \
+  -F "floor_db=-120"
 ```
 
 ## Estructura del proyecto
@@ -181,14 +215,16 @@ rir-rar/
 │   │   ├── health.py              # GET /health (M0)
 │   │   ├── audio_http.py          # wav_response y uploaded_file (ya resueltas)
 │   │   ├── signals.py             # POST /api/v1/signals/pink-noise, POST /api/v1/signals/sine-sweep y POST /api/v1/signals/synthetic-ir
-│   │   ├── filters.py             # POST /api/v1/filters/single-band
+│   │   ├── filters.py             # POST /api/v1/filters/frequencies, POST /api/v1/filters/band y POST /api/v1/filters/single-band
 │   │   ├── acoustics.py           # POST /api/v1/acoustics/parameters
-│   │   └── utils.py               # POST /api/v1/utils/smoothing, POST /api/v1/utils/schroeder y POST /api/v1/utils/lundeby
+│   │   ├── utils.py               # POST /api/v1/utils/smoothing, POST /api/v1/utils/schroeder y POST /api/v1/utils/lundeby y POST /api/v1/utils/log-scale
+│   │   └──analysis.py             # POST /api/v1/analysis/impulse-response
 │   ├── schemas/
 │   │   ├── __init__.py            # Modelos Pydantic de request/response (desde M1)
 │   │   ├── signals.py             # PinkNoiseRequest, SineSweepRequest y SyntheticIRRequest
-│   │   ├── responses.py           # HealthResponse y BandAnalysisResponse
-│   │   └── utils.py               # SmoothingMethod, SmoothingResponse, SchroederResponse y LundebyResponse
+│   │   ├── responses.py           # HealthResponse, BandAnalysisResponse, FrequenciesResponse y MultiBandFilterResponse
+│   │   ├── utils.py               # SmoothingMethod, SmoothingResponse, SchroederResponse, LundebyResponse y LogScaleResponse
+│   │   └── analysis.py            # LundebySummary, SchroederSummary y ImpulseResponseAnalysisResponse
 │   └── services/
 │       ├── __init__.py
 │       ├── pink_noise.py          # generate_pink_noise (M1)
@@ -221,7 +257,7 @@ rir-rar/
 ├── AI_LOG.md                      # Documentación de uso de IA
 ├── generate_evidences_m1.py          # Generación de documentación para M1
 ├── generate_evidences_m2.py       # Generación de documentación para M2
-└── generate_evidences_m3.py       # Generación de documentación para M2
+└── generate_evidences_m3.py       # Generación de documentación para M3
 ```
 
 Cada milestone expone lo que construye: los routers y schemas de `signals` se agregan en M1
@@ -367,6 +403,7 @@ o con un archivo `.env` en la raiz (ignorado por git).
 ![Convolución Impulso](docs/m1/convolucion_impulso.png)
 
 ### Prueba de Reproducción y Grabación Simultánea
+Se utilizó una placa de audio U_PHORIA UMC202HD en un canal mono grabada con un microfono Behringer Ultravoice XM8500 a una taza de muestreo de 44100 Hz y un Buffer Size de 256 Samples.
 ![Prueba de Grabación Real](docs/m1/prueba_grabacion.png)
 
 ### Espectro del Ruido Rosa (-3 dB/octava)
@@ -401,3 +438,95 @@ Forma de onda, respuesta en frecuencia e iluminación de la banda pasante en 1 k
 Forma de onda, respuesta en frecuencia e iluminación de la banda pasante en 1 kHz, y curva de decaimiento en dB para un recinto de reverberación larga:
 
 ![Análisis RI Real Larga](docs/m2/ri_real_larga.png)
+
+## Evidencias de Validación - Milestone 3
+
+Para validar el cálculo de parámetros acústicos según **ISO 3382-1**, se contrastaron los resultados de **RIR-API** frente al software de referencia **REW (Room EQ Wizard v5.40)** y frente a la **API de referencia de la cátedra** en las bandas de octava de 125 Hz a 4000 Hz, utilizando una respuesta al impulso sintética ($T_{60\text{ nominal}} = 1.50\text{ s}$, $f_s = 48\text{ kHz}$) y una respuesta al impulso real (`ri_larga.wav`, $f_s = 32\text{ kHz}$).
+
+### Criterios de aceptación
+* **Tiempos de reverberación (`EDT`, `T20`, `T30`):** desviación máxima permitida de **$\pm 10\%$** (o $\pm 0.5\text{ s}$) respecto de la referencia.
+* **Claridad musical (`C80`):** desviación máxima permitida de **$\pm 1.0\text{ dB}$** respecto de la referencia.
+
+### 1. Tablas comparativas — RI Real (`ri_larga.wav`)
+
+#### Early Decay Time (`EDT`)
+
+| Banda (Hz) | RIR-API | Software Ref. (REW) | Diferencia | Dentro de tolerancia |
+| :---: | :---: | :---: | :---: | :---: |
+| 125 | 1.224 s | 1.140 s | +0.084 s (+7.4%) | Sí ($\le 10\%$) |
+| 250 | 1.471 s | 1.496 s | -0.025 s (-1.7%) | Sí ($\le 10\%$) |
+| 500 | 1.540 s | 1.602 s | -0.062 s (-3.9%) | Sí ($\le 10\%$) |
+| 1000 | 1.510 s | 1.516 s | -0.006 s (-0.4%) | Sí ($\le 10\%$) |
+| 2000 | 1.124 s | 1.135 s | -0.011 s (-1.0%) | Sí ($\le 10\%$) |
+| 4000 | 0.528 s | 0.535 s | -0.007 s (-1.3%) | Sí ($\le 10\%$) |
+
+#### Tiempo de Reverberación (`T20`)
+
+| Banda (Hz) | RIR-API | Software Ref. (REW) | Diferencia | Dentro de tolerancia |
+| :---: | :---: | :---: | :---: | :---: |
+| 125 | 1.535 s | 1.428 s | +0.107 s (+7.5%) | Sí ($\le 10\%$) |
+| 250 | 1.533 s | 1.519 s | +0.014 s (+0.9%) | Sí ($\le 10\%$) |
+| 500 | 1.762 s | 1.714 s | +0.048 s (+2.8%) | Sí ($\le 10\%$) |
+| 1000 | 1.584 s | 1.581 s | +0.003 s (+0.2%) | Sí ($\le 10\%$) |
+| 2000 | 1.123 s | 1.177 s | -0.054 s (-4.6%) | Sí ($\le 10\%$) |
+| 4000 | 0.599 s | 0.638 s | -0.039 s (-6.1%) | Sí ($\le 10\%$) |
+
+#### Tiempo de Reverberación (`T30`)
+
+| Banda (Hz) | RIR-API | Software Ref. (REW) | Diferencia | Dentro de tolerancia |
+| :---: | :---: | :---: | :---: | :---: |
+| 125 | 1.591 s | 1.549 s | +0.042 s (+2.7%) | Sí ($\le 10\%$) |
+| 250 | 1.594 s | 1.605 s | -0.011 s (-0.7%) | Sí ($\le 10\%$) |
+| 500 | 1.787 s | 1.766 s | +0.021 s (+1.2%) | Sí ($\le 10\%$) |
+| 1000 | 1.631 s | 1.633 s | -0.002 s (-0.1%) | Sí ($\le 10\%$) |
+| 2000 | 1.224 s | 1.308 s | -0.084 s (-6.4%) | Sí ($\le 10\%$) |
+| 4000 | 0.658 s | 0.710 s | -0.052 s (-7.3%) | Sí ($\le 10\%$) |
+
+#### Claridad Musical (`C80`)
+
+| Banda (Hz) | RIR-API | Software Ref. (REW) | Diferencia | Dentro de tolerancia |
+| :---: | :---: | :---: | :---: | :---: |
+| 125 | 2.72 dB | 2.36 dB | +0.36 dB | Sí ($\le 1\text{ dB}$) |
+| 250 | 1.61 dB | 1.19 dB | +0.42 dB | Sí ($\le 1\text{ dB}$) |
+| 500 | -0.25 dB | -0.20 dB | -0.05 dB | Sí ($\le 1\text{ dB}$) |
+| 1000 | 0.13 dB | 0.34 dB | -0.21 dB | Sí ($\le 1\text{ dB}$) |
+| 2000 | 2.69 dB | 2.81 dB | -0.12 dB | Sí ($\le 1\text{ dB}$) |
+| 4000 | 9.03 dB | 9.44 dB | -0.41 dB | Sí ($\le 1\text{ dB}$) |
+
+---
+
+### 2. Tablas comparativas — RI Sintética ($T_{60\text{ nominal}} = 1.50\text{ s}$)
+
+#### Tiempo de Reverberación (`T20`)
+
+| Banda (Hz) | RIR-API | Software Ref. (REW) | Diferencia | Dentro de tolerancia |
+| :---: | :---: | :---: | :---: | :---: |
+| 125 | 1.693 s | 1.651 s | +0.042 s (+2.5%) | Sí ($\le 10\%$) |
+| 250 | 1.589 s | 1.594 s | -0.005 s (-0.3%) | Sí ($\le 10\%$) |
+| 500 | 1.425 s | 1.440 s | -0.015 s (-1.0%) | Sí ($\le 10\%$) |
+| 1000 | 1.471 s | 1.483 s | -0.012 s (-0.8%) | Sí ($\le 10\%$) |
+| 2000 | 1.542 s | 1.526 s | +0.016 s (+1.0%) | Sí ($\le 10\%$) |
+| 4000 | 1.496 s | 1.492 s | +0.004 s (+0.3%) | Sí ($\le 10\%$) |
+
+#### Tiempo de Reverberación (`T30`)
+
+| Banda (Hz) | RIR-API | Software Ref. (REW) | Diferencia | Dentro de tolerancia |
+| :---: | :---: | :---: | :---: | :---: |
+| 125 | 1.566 s | 1.615 s | -0.049 s (-3.0%) | Sí ($\le 10\%$) |
+| 250 | 1.501 s | 1.505 s | -0.004 s (-0.3%) | Sí ($\le 10\%$) |
+| 500 | 1.476 s | 1.472 s | +0.004 s (+0.3%) | Sí ($\le 10\%$) |
+| 1000 | 1.485 s | 1.485 s | 0.000 s (0.0%) | Sí ($\le 10\%$) |
+| 2000 | 1.524 s | 1.515 s | +0.009 s (+0.6%) | Sí ($\le 10\%$) |
+| 4000 | 1.513 s | 1.512 s | +0.001 s (+0.1%) | Sí ($\le 10\%$) |
+
+### Gráficas de validación y pipeline DSP
+
+![Envolventes de suavizado](docs/m3/0_envolvente_suavizado.png)
+![Curva de decaimiento de Schroeder](docs/m3/1_curva_schroeder.png)
+![Banco de filtros de octava IEC 61260](docs/m3/2_banco_filtros.png)
+![Validación triple de EDT](docs/m3/3a_validacion_triple_edt.png)
+![Validación triple de T20](docs/m3/3b_validacion_triple_t20.png)
+![Validación triple de T30](docs/m3/3c_validacion_triple_t30.png)
+![Validación de Claridad C80](docs/m3/3d_validacion_triple_c80.png)
+![Comparación integral de parámetros por banda](docs/m3/4_comparacion_integral_parametros.png)
+![Análisis de tolerancias respecto a REW](docs/m3/5_analisis_tolerancias_rew.png)

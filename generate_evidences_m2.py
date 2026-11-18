@@ -82,7 +82,6 @@ def process_synthetic_deconvolution():
     """Genera RI sintética, simula sweep, deconvoluciona y valida correlación."""
     fs = 44100
     duration = 2.0
-    t60_values = {500: 1.2, 1000: 1.0, 2000: 0.8}
 
     # 1. Generar RI Sintética
     synth_ir = generate_synthetic_ir(
