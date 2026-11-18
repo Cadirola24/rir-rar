@@ -9,12 +9,12 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    """Parametros configurables de RIR-API."""
+    """Parametros configurables de RIR-RAR."""
 
     model_config = SettingsConfigDict(env_prefix="RIR_", env_file=".env", extra="ignore")
 
-    app_name: str = "RIR-API"
-    version: str = "0.1.0"
+    app_name: str = "RIR-RAR"
+    version: str = "1.0.0"
     fs_default: int = 48000
     max_upload_mb: int = 50
     cors_origins: list[str] = ["*"]
