@@ -24,9 +24,9 @@ desde la limpieza y filtrado de la señal de excitación, hasta la obtención de
 
 | Nombre | Legajo | Rol | Rol por área del TP |
 |--------|--------|-----|---------------------|
-|Cadirola Valentino|80692|Dev|Servicios, Routers y Schemas para M1, implementación principal de M2, generación de documentación para M1 y M2, Servicios y Routers para M3
-|Collado Horlent Vicente|80478|Reviewer / QA|Servicios M1, corrección de fallas en milestones previos, Review y Merge de Pull Request, Servicios y documentación para M3
-|Pascuccelli Tadeo|72794|Integrador| Servicios M1, Servicios y Schemas para M3, Review y corrección de bugs para M3 
+|Cadirola Valentino|80692|Dev|Servicios, Routers y Schemas para M1, implementación principal de M2, generación de documentación para M1 y M2, Routers, Schemas y documentación para M3
+|Collado Horlent Vicente|80478|Reviewer / QA|Servicios M1, corrección de fallas en milestones previos, Review y Merge de Pull Request, Servicios para M3
+|Pascuccelli Tadeo|72794|Colaborador| Servicio play_and_record (M1)
 
 ## Requisitos previos
 
