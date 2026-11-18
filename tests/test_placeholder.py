@@ -10,4 +10,4 @@ def test_app_importa():
     """La aplicacion FastAPI se puede importar."""
     from app.main import app
 
-    assert app.title == "RIR-API"
+    assert app.title == "RIR-RAR"
