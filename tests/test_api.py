@@ -67,7 +67,7 @@ class TestRootEndpoint:
     def test_root_returns_api_info(self):
         """La raiz devuelve informacion de la API."""
         data = client.get("/").json()
-        assert data["name"] == "RIR-API"
+        assert data["name"] == "RIR-RAR"
         assert "docs" in data
 
 
